@@ -52,7 +52,7 @@ def sample_user(db_session):
 @pytest.fixture(scope='function')
 def auth_headers(client, sample_user):
     """Get authentication headers."""
-    response = client.post('/api/auth/login', json={
+    response = client.post('/api/v1/auth/login', json={
         'email': 'test@example.com',
         'password': 'password123'
     })

@@ -50,45 +50,57 @@ def create_app(config_name='default'):
         from app.utils.metrics import init_metrics
         init_metrics(flask_app)
 
-        # Initialize Sentry
-        if flask_app.config.get('SENTRY_DSN'):
-            import sentry_sdk
-            from sentry_sdk.integrations.flask import FlaskIntegration
-            
-            sentry_sdk.init(
-                dsn=flask_app.config['SENTRY_DSN'],
-                integrations=[FlaskIntegration()],
-                environment=config_name,
-                traces_sample_rate=1.0
-            )
+    # Initialize Sentry
+    if flask_app.config.get('SENTRY_DSN'):
+        import sentry_sdk
+        from sentry_sdk.integrations.flask import FlaskIntegration
+        
+        sentry_sdk.init(
+            dsn=flask_app.config['SENTRY_DSN'],
+            integrations=[FlaskIntegration()],
+            environment=config_name,
+            traces_sample_rate=1.0
+        )
 
-    # Create Flask-RESTX API
-    api = Api(
-        flask_app,
-        version='1.0',
-        title='Flask REST API',
-        description='Production-ready Flask REST API Template',
-        doc='/api/docs'
-    )
+    # Register Middleware
+    from app.middleware.version_deprecation import check_version_deprecation
+    flask_app.before_request(check_version_deprecation)
 
-    # Register error handlers
-    register_error_handlers(flask_app)
+    # Register Blueprints (API Versions)
+    from app.api.v1 import blueprint as api_v1
+    from app.api.v2 import blueprint as api_v2
 
-    # Register blueprints
-    # Import API implementations to register resources with namespaces
-    import app.api.auth
-    import app.api.users
+    flask_app.register_blueprint(api_v1)
+    flask_app.register_blueprint(api_v2)
 
-    from app.api import health_ns, oauth_ns
-    from app.api.metrics import api as metrics_ns
-    from app.schemas.auth import api as auth_ns
-    from app.schemas.user import api as users_ns
-    
-    api.add_namespace(health_ns, path='/api/health')
-    api.add_namespace(auth_ns, path='/api/auth')
-    api.add_namespace(users_ns, path='/api/users')
-    api.add_namespace(oauth_ns, path='/api/oauth')
-    api.add_namespace(metrics_ns, path='/metrics')
+    # API root endpoint
+    @flask_app.route('/api')
+    def api_root():
+        """API version information."""
+        return jsonify({
+            'name': 'Flask REST API',
+            'versions': {
+                'v1': {
+                    'url': '/api/v1',
+                    'docs': '/api/v1/docs',
+                    'status': 'deprecated'
+                },
+                'v2': {
+                    'url': '/api/v2',
+                    'docs': '/api/v2/docs',
+                    'status': 'stable'
+                }
+            },
+            'default_version': 'v2',
+            'latest_version': 'v2'
+        })
+
+    @flask_app.route('/')
+    def index():
+        return jsonify({
+            'message': 'Flask REST API',
+            'documentation': '/api'
+        })
 
     return flask_app
 
