@@ -19,6 +19,10 @@ def create_app(config_name='default'):
     cors.init_app(app, origins=app.config['CORS_ORIGINS'])
     limiter.init_app(app)
 
+    # Setup Logging
+    from app.utils import setup_logging
+    setup_logging(app)
+
     # Initialize Celery
     celery.conf.update(
         broker_url=app.config['CELERY_BROKER_URL'],
