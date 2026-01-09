@@ -5,6 +5,8 @@ from app.models.user import User
 from app.extensions import db
 
 
+from app.utils.metrics import user_registrations, user_logins, failed_logins, active_users
+
 class AuthService:
     """Authentication service."""
 
@@ -24,6 +26,10 @@ class AuthService:
         user.set_password(password)
         user.save()
 
+        # Increment metrics
+        user_registrations.inc()
+        active_users.set(User.query.filter_by(is_active=True).count())
+
         return user
 
     @staticmethod
@@ -32,11 +38,15 @@ class AuthService:
         user = User.query.filter_by(email=email, is_active=True).first()
 
         if not user or not user.check_password(password):
+            failed_logins.inc()
             raise ValueError('Invalid email or password')
 
         # Update last login
         user.last_login = datetime.utcnow()
         db.session.commit()
+
+        # Increment metrics
+        user_logins.inc()
 
         return user
 

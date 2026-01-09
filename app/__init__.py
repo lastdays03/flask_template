@@ -43,7 +43,12 @@ def create_app(config_name='default'):
     )
 
     # Import event handlers
-    import app.events.notifications
+    from app.events import notifications
+
+    # Initialize Metrics
+    if config_name != 'testing':
+        from app.utils.metrics import init_metrics
+        init_metrics(flask_app)
 
     # Create Flask-RESTX API
     api = Api(
@@ -62,15 +67,16 @@ def create_app(config_name='default'):
     import app.api.auth
     import app.api.users
 
-    from app.api import health_ns
+    from app.api import health_ns, oauth_ns
+    from app.api.metrics import api as metrics_ns
     from app.schemas.auth import api as auth_ns
     from app.schemas.user import api as users_ns
-    from app.api import oauth_ns
     
     api.add_namespace(health_ns, path='/api/health')
     api.add_namespace(auth_ns, path='/api/auth')
     api.add_namespace(users_ns, path='/api/users')
     api.add_namespace(oauth_ns, path='/api/oauth')
+    api.add_namespace(metrics_ns, path='/metrics')
 
     return flask_app
 
