@@ -9,24 +9,24 @@ from app.extensions import db, migrate, jwt, cors, limiter, celery
 
 def create_app(config_name='default'):
     """Create Flask application."""
-    app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    flask_app = Flask(__name__)
+    flask_app.config.from_object(config[config_name])
 
     # Initialize extensions
-    db.init_app(app)
-    migrate.init_app(app, db)
-    jwt.init_app(app)
-    cors.init_app(app, origins=app.config['CORS_ORIGINS'])
-    limiter.init_app(app)
+    db.init_app(flask_app)
+    migrate.init_app(flask_app, db)
+    jwt.init_app(flask_app)
+    cors.init_app(flask_app, origins=flask_app.config['CORS_ORIGINS'])
+    limiter.init_app(flask_app)
 
     # Setup Logging
     from app.utils import setup_logging
-    setup_logging(app)
+    setup_logging(flask_app)
 
     # Initialize Celery
     celery.conf.update(
-        broker_url=app.config['CELERY_BROKER_URL'],
-        result_backend=app.config['CELERY_RESULT_BACKEND'],
+        broker_url=flask_app.config['CELERY_BROKER_URL'],
+        result_backend=flask_app.config['CELERY_RESULT_BACKEND'],
         task_serializer='json',
         result_serializer='json',
         accept_content=['json'],
@@ -36,7 +36,7 @@ def create_app(config_name='default'):
 
     # Create Flask-RESTX API
     api = Api(
-        app,
+        flask_app,
         version='1.0',
         title='Flask REST API',
         description='Production-ready Flask REST API Template',
@@ -44,17 +44,22 @@ def create_app(config_name='default'):
     )
 
     # Register error handlers
-    register_error_handlers(app)
+    register_error_handlers(flask_app)
 
-    # Register blueprints (will add later)
+    # Register blueprints
+    # Import API implementations to register resources with namespaces
+    import app.api.auth
+    import app.api.users
+
     from app.api import health_ns
     from app.schemas.auth import api as auth_ns
     from app.schemas.user import api as users_ns
+    
     api.add_namespace(health_ns, path='/api/health')
     api.add_namespace(auth_ns, path='/api/auth')
     api.add_namespace(users_ns, path='/api/users')
 
-    return app
+    return flask_app
 
 
 def register_error_handlers(app):

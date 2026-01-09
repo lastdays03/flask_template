@@ -43,8 +43,8 @@ class AuthService:
     @staticmethod
     def create_tokens(user_id):
         """Create access and refresh tokens."""
-        access_token = create_access_token(identity=user_id)
-        refresh_token = create_refresh_token(identity=user_id)
+        access_token = create_access_token(identity=str(user_id))
+        refresh_token = create_refresh_token(identity=str(user_id))
 
         return {
             'access_token': access_token,

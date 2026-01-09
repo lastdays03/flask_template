@@ -8,11 +8,11 @@ from app.models.user import User
 @pytest.fixture(scope='session')
 def app():
     """Create Flask app for testing."""
-    app = create_app('testing')
+    application = create_app('testing')
 
-    with app.app_context():
+    with application.app_context():
         db.create_all()
-        yield app
+        yield application
         db.drop_all()
 
 
