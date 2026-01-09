@@ -47,8 +47,9 @@ def create_app(config_name='default'):
     register_error_handlers(app)
 
     # Register blueprints (will add later)
-    # from app.api import health_ns, auth_ns, users_ns
-    # api.add_namespace(health_ns, path='/api/health')
+    from app.api import health_ns
+    api.add_namespace(health_ns, path='/api/health')
+    # from app.api import auth_ns, users_ns
     # api.add_namespace(auth_ns, path='/api/auth')
     # api.add_namespace(users_ns, path='/api/users')
 
