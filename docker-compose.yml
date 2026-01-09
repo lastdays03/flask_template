@@ -97,13 +97,13 @@ services:
       dockerfile: docker/Dockerfile
     container_name: flask_flower
     restart: unless-stopped
-    command: celery -A celery_worker.celery flower --conf=flower_config
+    command: celery -A celery_worker.celery flower --conf=flower_config.py
     env_file:
       - .env
     environment:
       - FLASK_ENV=production
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
-      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - FLOWER_USER=${FLOWER_USER:-admin}
       - FLOWER_PASSWORD=${FLOWER_PASSWORD:-change_me}
       - FLOWER_PORT=5555
