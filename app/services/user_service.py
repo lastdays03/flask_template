@@ -27,7 +27,10 @@ class UserService:
     @staticmethod
     def get_user_by_id(user_id):
         """Get user by ID."""
-        return User.query.get(user_id)
+        user = User.query.get(user_id)
+        if not user or not user.is_active:
+            raise ValueError('User not found')
+        return user
 
     @staticmethod
     def update_user(user_id, data):
