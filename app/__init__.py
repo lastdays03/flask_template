@@ -34,6 +34,17 @@ def create_app(config_name='default'):
         enable_utc=True,
     )
 
+    # Initialize SocketIO
+    from app.websocket import socketio
+    socketio.init_app(
+        flask_app,
+        message_queue=flask_app.config['REDIS_URL'],
+        async_mode='threading'
+    )
+
+    # Import event handlers
+    import app.events.notifications
+
     # Create Flask-RESTX API
     api = Api(
         flask_app,
