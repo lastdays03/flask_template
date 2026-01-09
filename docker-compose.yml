@@ -31,6 +31,7 @@ services:
       - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
+      - flower
     networks:
       - backend
 
@@ -89,6 +90,33 @@ services:
       - ./logs:/app/logs
     networks:
       - backend
+
+  flower:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: flask_flower
+    restart: unless-stopped
+    command: celery -A celery_worker.celery flower --conf=flower_config
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - FLOWER_USER=${FLOWER_USER:-admin}
+      - FLOWER_PASSWORD=${FLOWER_PASSWORD:-change_me}
+      - FLOWER_PORT=5555
+      - FLOWER_URL_PREFIX=/flower
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - backend
+    volumes:
+      - .:/app
 
 volumes:
   mariadb_data:
