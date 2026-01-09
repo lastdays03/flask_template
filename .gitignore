@@ -51,3 +51,7 @@ htmlcov/
 
 # Docker
 .DS_Store
+
+# Claude
+.agent
+.claude
