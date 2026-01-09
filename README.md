@@ -130,8 +130,9 @@ celery -A celery_worker.celery flower --conf=flower_config
 
 서버 실행 후 브라우저에서 아래 주소로 접속하여 API 문서를 확인할 수 있습니다.
 
-- **Swagger UI**: [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
-- **API Root**: [http://localhost:5000/api](http://localhost:5000/api) (버전 정보 확인)
+- **Swagger UI (v1)**: [http://localhost:5000/api/v1/docs](http://localhost:5000/api/v1/docs)
+- **Swagger UI (v2)**: [http://localhost:5000/api/v2/docs](http://localhost:5000/api/v2/docs)
+- **API Root**: [http://localhost:5000/api](http://localhost:5000/api) (버전 정보 및 Deprecation 상태 확인)
 
 ### 주요 엔드포인트
 
@@ -141,10 +142,18 @@ celery -A celery_worker.celery flower --conf=flower_config
 - `GET /api/v1/auth/google/login`: 구글 소셜 로그인
 
 **Users (v1 & v2)**
-- `GET /api/v1/users`: 사용자 목록 (기본)
-- `GET /api/v2/users`: 사용자 목록 (고급 페이지네이션 적용)
-  - 응답 헤더에 `Link` (RFC 5988) 포함
-  - 응답 바디에 `metadata`, `links` 등 HATEOAS 정보 포함
+- `GET /api/v1/users`: 사용자 목록 (v1)
+  - 응답: `{ "users": [...], "total": 100, "page": 1 }`
+- `GET /api/v2/users`: 사용자 목록 (v2 - 권장)
+  - 응답: HATEOAS 구조 및 풍부한 메타데이터 포함
+  ```json
+  {
+    "data": [...],
+    "meta": { "page": 1, "per_page": 10, "total": 100 },
+    "links": { "self": "...", "next": "..." }
+  }
+  ```
+  - 헤더: `Link` (RFC 5988 페이지네이션) 포함
 
 **Monitoring**
 - `GET /api/v1/health`: 헬스 체크
