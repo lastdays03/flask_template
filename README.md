@@ -1,84 +1,105 @@
 # Flask Production REST API Template
 
-Production-ready Flask REST API backend template with JWT authentication, Celery async tasks, and Docker deployment.
+프로덕션 환경을 위한 Flask REST API 백엔드 템플릿입니다. JWT 인증, Celery 비동기 작업, Redis 캐싱, WebSocket 실시간 통신, 모니터링 시스템(Prometheus, Sentry) 및 Docker 배포 환경을 포함하고 있습니다.
 
-## Features
+## 주요 기능 (Key Features)
 
-- **Flask 3.x** with Application Factory pattern
-- **Flask-RESTX** for automatic Swagger/OpenAPI documentation
-- **JWT Authentication** with access and refresh tokens
-- **SQLAlchemy ORM** with MySQL support
-- **Celery** for asynchronous task processing
-- **Redis** for caching and task queue
-- **Rate Limiting** with Flask-Limiter
-- **CORS** configuration
-- **Structured JSON logging**
-- **Docker & Docker Compose** for easy deployment
-- **pytest** test suite with fixtures
-- **Blueprint-based** modular architecture
+- **Flask 3.x** (Application Factory 패턴 적용)
+- **API 버전 관리**: Blueprint 기반 v1/v2 API 구조 및 마이그레이션 전략
+- **Flask-RESTX**: Swagger/OpenAPI 문서 자동화
+- **인증 (Authentication)**:
+  - JWT Access/Refresh Token 기반 인증
+  - **Google OAuth2** 소셜 로그인
+- **데이터베이스**: SQLAlchemy ORM (MySQL 8.0)
+- **비동기 작업**: Celery 5.3 + Redis Broker
+- **캐싱 & 큐**: Service 레벨 **Redis Caching** (@cached 데코레이터) 및 메시지 큐
+- **실시간 통신**: **Flask-SocketIO** 기반 WebSocket 지원 (알림 등)
+- **모니터링 & 관측성**:
+  - **Prometheus** 메트릭 수집 (/metrics)
+  - **Sentry** 에러 트래킹 연동
+  - **Celery Flower** 대시보드 (작업 모니터링)
+- **고급 페이지네이션**: HATEOAS 링크 및 RFC 5988 Link Header 지원
+- **CI/CD**: GitHub Actions (테스트, 린팅, 도커 빌드)
+- **배포**: Docker & Docker Compose (Nginx 리버스 프록시 포함)
 
-## Tech Stack
+## 기술 스택 (Tech Stack)
 
-- **Web Framework**: Flask 3.0.3, Flask-RESTX 1.3.0
-- **Database**: MySQL 8.0 with SQLAlchemy ORM
-- **Authentication**: Flask-JWT-Extended with bcrypt
-- **Task Queue**: Celery 5.3 with Redis broker
+- **Backend**: Python 3.12, Flask 3.0
+- **API**: Flask-RESTX 1.3
+- **Database**: MySQL 8.0
 - **Cache/Queue**: Redis 7
-- **WSGI Server**: Gunicorn
-- **Reverse Proxy**: Nginx
-- **Testing**: pytest, pytest-flask
+- **Worker**: Celery 5.3
+- **Real-time**: Flask-SocketIO 5.3, Eventlet
+- **Monitoring**: Prometheus Client, Sentry SDK, Flower
+- **Server**: Gunicorn, Nginx
+- **Testing**: pytest
 
-## Project Structure
+## 프로젝트 구조 (Project Structure)
 
-```
+```text
 flask_template/
+├── .github/
+│   └── workflows/           # CI/CD (ci.yml, cd.yml)
 ├── app/
-│   ├── __init__.py          # Application factory
-│   ├── config.py            # Configuration
-│   ├── extensions.py        # Flask extensions
-│   ├── models/              # Database models
-│   ├── api/                 # API endpoints
-│   ├── schemas/             # Request/response schemas
-│   ├── services/            # Business logic
-│   ├── tasks/               # Celery tasks
-│   └── utils/               # Utilities
-├── tests/                   # Test suite
-├── docker/                  # Docker configuration
-├── logs/                    # Application logs
-├── migrations/              # Database migrations
-├── docker-compose.yml       # Docker services
-├── requirements.txt         # Python dependencies
-└── wsgi.py                  # WSGI entry point
+│   ├── __init__.py          # 앱 팩토리 (Sentry, Metrics, Blueprint 설정)
+│   ├── api/                 # API 엔드포인트
+│   │   ├── v1/              # API v1 (Auth, User 등)
+│   │   └── v2/              # API v2 (개선된 User API)
+│   ├── events/              # WebSocket 이벤트 핸들러
+│   ├── middleware/          # 미들웨어 (버전 Deprecation 등)
+│   ├── models/              # DB 모델
+│   ├── schemas/             # Pydantic/Marshmallow 스키마
+│   ├── services/            # 비즈니스 로직 (Service Layer)
+│   ├── tasks/               # Celery 비동기 작업
+│   └── utils/               # 유틸리티 (Cache, Logger, Metrics, Pagination)
+├── docker/                  # Docker 설정 (Dockerfile, Nginx)
+├── docs/                    # 프로젝트 문서 (마이그레이션 가이드 등)
+├── tests/                   # 테스트 스위트
+├── flower_config.py         # Flower 설정 파일
+├── docker-compose.yml       # Docker Compose 설정
+├── requirements.txt         # 의존성 패키지
+└── wsgi.py                  # WSGI 진입점
 ```
 
-## Quick Start
+## 시작하기 (Quick Start)
 
-### Local Development
-
-1. **Clone and setup**
+### 1. 로컬 개발 환경 설정
 
 ```bash
+# 레포지토리 클론
 git clone <repository-url>
 cd flask_template
+
+# 가상환경 생성 및 활성화
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements-dev.txt
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 의존성 설치
+pip install -r requirements.txt
 ```
 
-2. **Configure environment**
+### 2. 환경 변수 설정
+
+`.env.example` 파일을 복사하여 `.env` 파일을 생성하고 설정을 수정합니다.
 
 ```bash
 cp .env.example .env
-# Edit .env with your settings
 ```
 
-3. **Start services with Docker**
+**주요 환경 변수:**
+- `SENTRY_DSN`: Sentry 프로젝트 DSN
+- `GOOGLE_CLIENT_ID` / `SECRET`: 구글 로그인 연동 시 필요
+- `FLOWER_USER` / `PASSWORD`: Celery 모니터링 대시보드 접근 계정
+
+### 3. 서비스 실행 (Docker)
+
+MySQL, Redis 등 인프라 서비스를 Docker로 실행합니다.
 
 ```bash
 docker-compose up -d mysql redis
 ```
 
-4. **Initialize database**
+### 4. 데이터베이스 초기화
 
 ```bash
 flask db init
@@ -86,158 +107,82 @@ flask db migrate -m "Initial migration"
 flask db upgrade
 ```
 
-5. **Run development server**
+### 5. 서버 실행
 
+**Flask 개발 서버:**
 ```bash
 flask run
 ```
 
-6. **Run Celery worker** (in separate terminal)
-
+**Celery 워커:**
 ```bash
 celery -A celery_worker.celery worker --loglevel=info
 ```
 
-### Docker Deployment
+**Celery Flower 대시보드 (선택):**
+```bash
+celery -A celery_worker.celery flower --conf=flower_config
+```
+
+---
+
+## API 사용법 (API Documentation)
+
+서버 실행 후 브라우저에서 아래 주소로 접속하여 API 문서를 확인할 수 있습니다.
+
+- **Swagger UI**: [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
+- **API Root**: [http://localhost:5000/api](http://localhost:5000/api) (버전 정보 확인)
+
+### 주요 엔드포인트
+
+**Authentication (v1)**
+- `POST /api/v1/auth/register`: 회원가입
+- `POST /api/v1/auth/login`: 로그인
+- `GET /api/v1/auth/google/login`: 구글 소셜 로그인
+
+**Users (v1 & v2)**
+- `GET /api/v1/users`: 사용자 목록 (기본)
+- `GET /api/v2/users`: 사용자 목록 (고급 페이지네이션 적용)
+  - 응답 헤더에 `Link` (RFC 5988) 포함
+  - 응답 바디에 `metadata`, `links` 등 HATEOAS 정보 포함
+
+**Monitoring**
+- `GET /api/v1/health`: 헬스 체크
+- `GET /metrics`: Prometheus 메트릭
+
+## 배포 (Deployment)
+
+Docker Compose를 사용하여 전체 스택(App, Worker, Flower, Nginx, DB, Redis)을 한 번에 배포할 수 있습니다.
 
 ```bash
-# Build and start all services
+# 서비스 빌드 및 실행
 docker-compose up --build -d
 
-# Run migrations
-docker-compose exec app flask db upgrade
-
-# View logs
-docker-compose logs -f app
-
-# Stop services
-docker-compose down
+# 로그 확인
+docker-compose logs -f
 ```
 
-## API Documentation
+- **API Server**: http://localhost (Nginx 80포트)
+- **Flower Dashboard**: http://localhost/flower/ (Celery 모니터링)
 
-Once the application is running, visit:
+## 테스트 (Testing)
 
-- **Swagger UI**: http://localhost:5000/api/docs
-- **Health Check**: http://localhost:5000/api/health
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login and get tokens
-- `POST /api/auth/refresh` - Refresh access token
-- `GET /api/auth/me` - Get current user info
-
-### Users
-
-- `GET /api/users` - List users (paginated)
-- `GET /api/users/<id>` - Get user by ID
-- `PUT /api/users/<id>` - Update user
-- `DELETE /api/users/<id>` - Delete user (soft delete)
-
-### Health
-
-- `GET /api/health` - Service health check
-
-## Testing
+GitHub Actions CI 파이프라인이 구성되어 있습니다. 로컬에서 테스트를 실행하려면:
 
 ```bash
-# Run all tests
+# 전체 테스트 실행
 pytest -v
 
-# Run with coverage
-pytest --cov=app --cov-report=html tests/
-
-# Run specific test file
-pytest tests/test_auth.py -v
+# 커버리지 리포트
+pytest --cov=app tests/
 ```
 
-## Environment Variables
+## 모니터링 및 관측성
 
-Required environment variables (see `.env.example`):
+1. **Prometheus**: `/metrics` 엔드포인트를 통해 Flask 및 시스템 메트릭을 노출합니다.
+2. **Sentry**: 애플리케이션 예외 발생 시 자동으로 Sentry로 에러 리포트를 전송합니다.
+3. **Flower**: `http://localhost/flower/`에서 비동기 작업 처리 현황을 실시간으로 모니터링할 수 있습니다.
 
-```bash
-# Flask
-FLASK_APP=wsgi.py
-FLASK_ENV=development
-SECRET_KEY=your-secret-key
-JWT_SECRET_KEY=your-jwt-secret-key
-
-# Database
-DATABASE_URL=mysql+pymysql://user:password@localhost:3306/flask_app
-
-# Redis
-REDIS_URL=redis://localhost:6379/0
-CELERY_BROKER_URL=redis://localhost:6379/1
-CELERY_RESULT_BACKEND=redis://localhost:6379/1
-
-# CORS
-CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
-
-# Rate Limiting
-RATELIMIT_STORAGE_URL=redis://localhost:6379/2
-```
-
-## Development
-
-### Code Formatting
-
-```bash
-black app/ tests/
-flake8 app/ tests/
-```
-
-### Database Migrations
-
-```bash
-# Create migration
-flask db migrate -m "Description"
-
-# Apply migration
-flask db upgrade
-
-# Rollback migration
-flask db downgrade
-```
-
-### Adding New Endpoints
-
-1. Create schema in `app/schemas/`
-2. Create service in `app/services/`
-3. Create API endpoint in `app/api/`
-4. Register namespace in `app/__init__.py`
-5. Add tests in `tests/`
-
-## Production Deployment
-
-1. Set `FLASK_ENV=production` in `.env`
-2. Generate strong `SECRET_KEY` and `JWT_SECRET_KEY`
-3. Configure production database URL
-4. Set proper `CORS_ORIGINS`
-5. Use `docker-compose up -d` for deployment
-6. Set up SSL/TLS with Let's Encrypt
-7. Configure log aggregation (ELK, Datadog, etc.)
-8. Set up monitoring (Prometheus, Grafana, etc.)
-
-## Security
-
-- JWT tokens with configurable expiration
-- Password hashing with bcrypt
-- Rate limiting on authentication endpoints
-- CORS configuration
-- SQL injection protection via SQLAlchemy ORM
-- Input validation with Flask-RESTX
-
-## License
+## 라이선스 (License)
 
 MIT License
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
