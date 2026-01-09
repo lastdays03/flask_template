@@ -7,22 +7,20 @@ class UserService:
     """User service."""
 
     @staticmethod
-    @cached(ttl=600, key_prefix='user_list')
+    @cached(ttl=60, key_prefix='user_list')
     def get_users(page=1, per_page=10):
-        """Get paginated list of users (cached for 10 minutes)."""
+        """
+        Get paginated list of users.
+
+        Returns pagination object.
+        """
         pagination = User.query.filter_by(is_active=True).paginate(
             page=page,
             per_page=per_page,
             error_out=False
         )
 
-        return {
-            'users': [user.to_dict() for user in pagination.items],
-            'total': pagination.total,
-            'page': page,
-            'per_page': per_page,
-            'pages': pagination.pages
-        }
+        return pagination
 
     @staticmethod
     def get_user_by_id(user_id):

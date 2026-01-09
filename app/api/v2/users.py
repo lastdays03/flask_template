@@ -27,16 +27,22 @@ class UserListV2(Resource):
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
 
-        result = UserService.get_users(page=page, per_page=per_page)
+        if page < 1:
+            page = 1
+        if per_page < 1:
+            per_page = 10
+
+        pagination = UserService.get_users(page=page, per_page=per_page)
+        users = [user.to_dict() for user in pagination.items]
 
         return {
             'success': True,
-            'data': result['users'],
+            'data': users,
             'pagination': {
-                'page': result['page'],
-                'per_page': result['per_page'],
-                'total': result['total'],
-                'pages': result['pages']
+                'page': pagination.page,
+                'per_page': pagination.per_page,
+                'total': pagination.total,
+                'pages': pagination.pages
             },
             'metadata': {
                 'version': '2.0',

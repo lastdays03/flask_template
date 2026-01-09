@@ -9,6 +9,7 @@ def test_get_users_list(client, auth_headers, sample_user):
     assert response.status_code == 200
     data = response.get_json()
     assert 'users' in data
+    assert 'links' in data
     assert data['total'] >= 1
 
 
