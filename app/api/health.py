@@ -14,6 +14,8 @@ class HealthCheck(Resource):
 
     def get(self):
         """Check service health."""
+        from sqlalchemy import text
+        
         status = {
             'status': 'healthy',
             'timestamp': datetime.utcnow().isoformat(),
@@ -23,7 +25,7 @@ class HealthCheck(Resource):
 
         # Check database
         try:
-            db.session.execute('SELECT 1')
+            db.session.execute(text('SELECT 1'))
             status['services']['database'] = 'ok'
         except Exception as e:
             status['services']['database'] = 'error'
