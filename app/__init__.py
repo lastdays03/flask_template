@@ -50,6 +50,18 @@ def create_app(config_name='default'):
         from app.utils.metrics import init_metrics
         init_metrics(flask_app)
 
+        # Initialize Sentry
+        if flask_app.config.get('SENTRY_DSN'):
+            import sentry_sdk
+            from sentry_sdk.integrations.flask import FlaskIntegration
+            
+            sentry_sdk.init(
+                dsn=flask_app.config['SENTRY_DSN'],
+                integrations=[FlaskIntegration()],
+                environment=config_name,
+                traces_sample_rate=1.0
+            )
+
     # Create Flask-RESTX API
     api = Api(
         flask_app,

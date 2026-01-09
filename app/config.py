@@ -17,6 +17,9 @@ class BaseConfig:
     GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
     GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:5000/api/oauth/google/callback')
 
+    # Sentry
+    SENTRY_DSN = os.getenv('SENTRY_DSN')
+
     # JWT
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
