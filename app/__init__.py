@@ -1,8 +1,6 @@
 """Application factory."""
 
-import logging
 from flask import Flask, jsonify
-from flask_restx import Api
 
 from app.config import config
 from app.extensions import db, migrate, jwt, cors, limiter, celery
@@ -19,6 +17,13 @@ def create_app(config_name="default"):
     jwt.init_app(flask_app)
     cors.init_app(flask_app, origins=flask_app.config["CORS_ORIGINS"])
     limiter.init_app(flask_app)
+
+    # JWT Config
+    from app.utils.auth import check_if_token_in_blocklist
+
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        return check_if_token_in_blocklist(jwt_header, jwt_payload)
 
     # Setup Logging
     from app.utils import setup_logging
@@ -40,11 +45,13 @@ def create_app(config_name="default"):
     from app.websocket import socketio
 
     socketio.init_app(
-        flask_app, message_queue=flask_app.config["REDIS_URL"], async_mode="threading"
+        flask_app,
+        message_queue=flask_app.config["REDIS_URL"],
+        async_mode="threading",
     )
 
     # Import event handlers
-    from app.events import notifications
+    from app.events import notifications  # noqa
 
     # Initialize Metrics
     if config_name != "testing":

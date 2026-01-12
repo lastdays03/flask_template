@@ -64,3 +64,10 @@ class AuthService:
             "refresh_token": refresh_token,
             "token_type": "Bearer",
         }
+
+    @staticmethod
+    def logout_user(jti):
+        """Logout user by adding token to blocklist."""
+        from app.utils.auth import add_token_to_blocklist
+
+        return add_token_to_blocklist(jti)

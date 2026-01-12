@@ -44,7 +44,13 @@ def setup_logging(app):
         def filter(self, record):
             msg = record.msg
             if isinstance(msg, dict):
-                for key in ["password", "token", "secret", "access_token", "refresh_token"]:
+                for key in [
+                    "password",
+                    "token",
+                    "secret",
+                    "access_token",
+                    "refresh_token",
+                ]:
                     if key in msg:
                         msg[key] = "***MASKED***"
             return True
@@ -55,7 +61,7 @@ def setup_logging(app):
     app.logger.addHandler(file_handler)
     app.logger.addHandler(error_handler)
     app.logger.addHandler(stream_handler)
-    
+
     app.logger.addFilter(sensitive_filter)
     file_handler.addFilter(sensitive_filter)
     stream_handler.addFilter(sensitive_filter)

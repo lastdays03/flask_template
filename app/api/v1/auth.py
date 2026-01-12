@@ -8,7 +8,6 @@ from app.schemas.auth import (
     login_model,
     register_model,
     token_model,
-    message_model,
 )
 from app.services.auth_service import AuthService
 from app.extensions import limiter
@@ -43,7 +42,7 @@ class Register(Resource):
 
         except ValueError as e:
             api.abort(400, str(e))
-        except Exception as e:
+        except Exception:
             api.abort(500, "Registration failed")
 
 
@@ -70,7 +69,7 @@ class Login(Resource):
 
         except ValueError as e:
             api.abort(401, str(e))
-        except Exception as e:
+        except Exception:
             api.abort(500, "Login failed")
 
 
@@ -105,3 +104,16 @@ class Me(Resource):
             api.abort(404, "User not found")
 
         return {"success": True, "data": user.to_dict()}, 200
+
+
+@api.route("/logout")
+class Logout(Resource):
+    """User logout."""
+
+    @jwt_required()
+    @api.response(200, "Logout successful")
+    def post(self):
+        """Logout user."""
+        jti = get_jwt()["jti"]
+        AuthService.logout_user(jti)
+        return {"success": True, "message": "Logout successful"}, 200
