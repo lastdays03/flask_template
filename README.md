@@ -8,8 +8,9 @@
 - **API 버전 관리**: Blueprint 기반 v1/v2 API 구조 및 마이그레이션 전략
 - **Flask-RESTX**: Swagger/OpenAPI 문서 자동화
 - **인증 (Authentication)**:
-  - JWT Access/Refresh Token 기반 인증
+  - JWT Access/Refresh Token 기반 인증 (Redis Blacklist 연동 로그아웃 지원)
   - **Google OAuth2** 소셜 로그인
+  - **강력한 비밀번호 정책**: 최소 8자, 대/소문자, 숫자, 특수문자 포함 강제
 - **데이터베이스**: SQLAlchemy ORM (MySQL 8.0)
 - **비동기 작업**: Celery 5.3 + Redis Broker
 - **캐싱 & 큐**: Service 레벨 **Redis Caching** (@cached 데코레이터) 및 메시지 큐
@@ -140,6 +141,7 @@ celery -A celery_worker.celery flower --conf=flower_config
 - `POST /api/v1/auth/register`: 회원가입
 - `POST /api/v1/auth/login`: 로그인
 - `GET /api/v1/auth/google/login`: 구글 소셜 로그인
+- `POST /api/v1/auth/logout`: 로그아웃 (토큰 무효화)
 
 **Users (v1 & v2)**
 - `GET /api/v1/users`: 사용자 목록 (v1)
