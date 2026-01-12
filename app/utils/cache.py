@@ -20,8 +20,6 @@ def cache_key(*args, **kwargs):
     return hashlib.md5(key_data.encode()).hexdigest()
 
 
-
-
 def cached(ttl=300, key_prefix=""):
     """
     Cache decorator for expensive operations.
