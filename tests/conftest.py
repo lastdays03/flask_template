@@ -1,5 +1,11 @@
 """Pytest configuration and fixtures."""
 
+import sys
+import os
+
+# Add project root to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import pytest
 from app import create_app
 from app.extensions import db
