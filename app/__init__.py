@@ -102,69 +102,9 @@ def create_app(config_name='default'):
             'documentation': '/api'
         })
 
+    # Register Error Handlers
+    from app.utils.error_handlers import register_error_handlers, register_jwt_error_handlers
+    register_error_handlers(flask_app)
+    register_jwt_error_handlers(jwt)
+
     return flask_app
-
-
-def register_error_handlers(app):
-    """Register error handlers."""
-
-    @app.errorhandler(400)
-    def bad_request(error):
-        return jsonify({
-            'success': False,
-            'error': {
-                'code': 'BAD_REQUEST',
-                'message': str(error)
-            }
-        }), 400
-
-    @app.errorhandler(401)
-    def unauthorized(error):
-        return jsonify({
-            'success': False,
-            'error': {
-                'code': 'UNAUTHORIZED',
-                'message': 'Authentication required'
-            }
-        }), 401
-
-    @app.errorhandler(403)
-    def forbidden(error):
-        return jsonify({
-            'success': False,
-            'error': {
-                'code': 'FORBIDDEN',
-                'message': 'Access denied'
-            }
-        }), 403
-
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({
-            'success': False,
-            'error': {
-                'code': 'NOT_FOUND',
-                'message': 'Resource not found'
-            }
-        }), 404
-
-    @app.errorhandler(429)
-    def rate_limit_exceeded(error):
-        return jsonify({
-            'success': False,
-            'error': {
-                'code': 'RATE_LIMIT_EXCEEDED',
-                'message': 'Too many requests'
-            }
-        }), 429
-
-    @app.errorhandler(500)
-    def internal_error(error):
-        app.logger.error(f'Internal error: {error}')
-        return jsonify({
-            'success': False,
-            'error': {
-                'code': 'INTERNAL_ERROR',
-                'message': 'Internal server error'
-            }
-        }), 500

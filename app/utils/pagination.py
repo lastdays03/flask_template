@@ -87,18 +87,19 @@ def paginate_response(pagination, data, endpoint, **kwargs):
 
 
 class Pagination:
-    """Custom pagination class with additional utilities."""
+    """Serializable pagination object for caching (detached from session)."""
 
-    def __init__(self, query, page, per_page, total, items):
-        self.query = query
+    def __init__(self, items, page, per_page, total):
+        self.items = items
         self.page = page
         self.per_page = per_page
         self.total = total
-        self.items = items
 
     @property
     def pages(self):
         """Total number of pages."""
+        if self.per_page == 0 or self.total == 0:
+            return 0
         return (self.total + self.per_page - 1) // self.per_page
 
     @property
@@ -121,15 +122,15 @@ class Pagination:
         """Next page number."""
         return self.page + 1 if self.has_next else None
 
-    def to_dict(self):
-        """Convert pagination to dictionary."""
-        return {
-            'page': self.page,
-            'per_page': self.per_page,
-            'total': self.total,
-            'pages': self.pages,
-            'has_prev': self.has_prev,
-            'has_next': self.has_next,
-            'prev_num': self.prev_num,
-            'next_num': self.next_num,
-        }
+    def iter_pages(self, left_edge=2, left_current=2, right_current=5, right_edge=2):
+        """Iterate over pages (compatibility with SQLAlchemy Pagination)."""
+        last = 0
+        for num in range(1, self.pages + 1):
+            if num <= left_edge or \
+               (num > self.page - left_current - 1 and \
+                num < self.page + right_current) or \
+               num > self.pages - right_edge:
+                if last + 1 != num:
+                    yield None
+                yield num
+                last = num

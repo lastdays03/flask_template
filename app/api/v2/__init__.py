@@ -22,3 +22,7 @@ api = Api(
 )
 
 api.add_namespace(users_ns, path='/users')
+
+# Register error handlers
+from app.utils.error_handlers import register_api_error_handlers
+register_api_error_handlers(api)

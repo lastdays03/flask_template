@@ -35,9 +35,15 @@ def setup_logging(app):
     error_handler.setLevel(logging.ERROR)
     error_handler.setFormatter(json_formatter)
 
+    # Stream handler (stdout) for Docker logs
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    stream_handler.setFormatter(json_formatter)
+
     # Configure app logger
     app.logger.addHandler(file_handler)
     app.logger.addHandler(error_handler)
+    app.logger.addHandler(stream_handler)
     app.logger.setLevel(logging.INFO)
 
     # Log startup

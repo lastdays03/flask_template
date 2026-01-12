@@ -14,8 +14,9 @@ timeout = 60
 keepalive = 2
 
 # Logging
-accesslog = '/app/logs/access.log'
-errorlog = '/app/logs/error.log'
+# Logging (Handled by app/utils/logger.py and Docker stdout/stderr)
+accesslog = '-'
+errorlog = '-'
 loglevel = 'info'
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 

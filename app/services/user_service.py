@@ -14,13 +14,25 @@ class UserService:
 
         Returns pagination object.
         """
+        from app.utils.pagination import Pagination
+
         pagination = User.query.filter_by(is_active=True).paginate(
             page=page,
             per_page=per_page,
             error_out=False
         )
 
-        return pagination
+        # Detach items from session to make them pickleable
+        items = pagination.items
+        for item in items:
+            db.session.expunge(item)
+
+        return Pagination(
+            items=items,
+            page=pagination.page,
+            per_page=pagination.per_page,
+            total=pagination.total
+        )
 
     @staticmethod
     def get_user_by_id(user_id):
