@@ -180,9 +180,10 @@ docker-compose logs -f
  
  본 프로젝트는 CI 파이프라인에서 엄격한 코드 품질 검사를 수행합니다. Pull Request 제출 전 반드시 로컬에서 린트를 통과해야 합니다.
  
- 1. **개발 의존성 설치**
+ 1. **의존성 패키지 설치**
     ```bash
-    pip install -r requirements-dev.txt
+    # 앱 실행 및 개발 툴 모두 설치
+    pip install -r requirements.txt -r requirements-dev.txt
     ```
  
  2. **코드 포맷팅 (Black)**
@@ -196,7 +197,8 @@ docker-compose logs -f
     # 린트 검사 실행
     pylint app
     ```
-    - CI 통과 기준: 점수 **9.0** 이상
+    - **CI 통과 기준**: 점수 **9.0** 이상
+    - *참고: 로컬 환경 구성에 따라 `import-error`로 점수가 낮게 나올 수 있습니다. 이 경우 소스 코드의 로직/스타일 경고를 우선적으로 해결해 주세요.*
  
  ## 테스트 (Testing)
  
