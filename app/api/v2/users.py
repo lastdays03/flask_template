@@ -14,6 +14,10 @@ class UserListV2(Resource):
 
     @jwt_required()
     @api_version_required(min_version='2.0')
+    @api.doc(params={
+        'page': {'description': 'Page number', 'type': 'integer', 'default': 1},
+        'per_page': {'description': 'Items per page', 'type': 'integer', 'default': 10}
+    })
     @api.response(200, 'Success')
     def get(self):
         """
@@ -22,6 +26,9 @@ class UserListV2(Resource):
         Includes metadata and enhanced response structure.
         """
         import time
+        from flask import jsonify, make_response
+        from app.utils.pagination import generate_pagination_links, paginate_response
+
         start_time = time.time()
 
         page = request.args.get('page', 1, type=int)
@@ -35,17 +42,35 @@ class UserListV2(Resource):
         pagination = UserService.get_users(page=page, per_page=per_page)
         users = [user.to_dict() for user in pagination.items]
 
-        return {
-            'success': True,
-            'data': users,
-            'pagination': {
-                'page': pagination.page,
-                'per_page': pagination.per_page,
-                'total': pagination.total,
-                'pages': pagination.pages
-            },
-            'metadata': {
-                'version': '2.0',
-                'response_time_ms': round((time.time() - start_time) * 1000, 2)
-            }
-        }, 200
+        # Use utility to structure the response data
+        response_data = paginate_response(
+            pagination,
+            users,
+            'api_v2.users_user_list_v2',
+            per_page=per_page
+        )
+        
+        # Add additional metadata for v2
+        response_data['metadata'] = {
+            'version': '2.0',
+            'response_time_ms': round((time.time() - start_time) * 1000, 2)
+        }
+
+        # Create response object
+        response = make_response(jsonify(response_data), 200)
+
+        # Add Link header (RFC 5988)
+        link_header = generate_pagination_links(
+            pagination,
+            'api_v2.users_user_list_v2',
+            per_page=per_page
+        )
+        response.headers['Link'] = link_header
+
+        # Add custom pagination headers
+        response.headers['X-Total-Count'] = str(pagination.total)
+        response.headers['X-Page'] = str(pagination.page)
+        response.headers['X-Per-Page'] = str(pagination.per_page)
+        response.headers['X-Total-Pages'] = str(pagination.pages)
+
+        return response
