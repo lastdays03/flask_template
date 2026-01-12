@@ -1,23 +1,58 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>WebSocket Test</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-        #messages { height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin-top: 10px; }
-        .message { margin: 5px 0; padding: 5px; background: #f9f9f9; border-radius: 4px; }
-        .status { font-weight: bold; margin-bottom: 10px; }
-        .connected { color: green; }
-        .disconnected { color: red; }
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .connected {
+            color: green;
+        }
+
+        .disconnected {
+            color: red;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>WebSocket Test</h1>
         <div id="status" class="status disconnected">Disconnected</div>
-        
+
         <div>
             <label>JWT Token:</label>
             <input type="text" id="token" placeholder="Enter JWT Token" style="width: 100%; margin-bottom: 10px;">
@@ -45,7 +80,7 @@
                 socket.disconnect();
             }
 
-            socket = io('http://localhost:5000', {
+            socket = io('http://localhost', {
                 auth: { token: token },
                 transports: ['websocket', 'polling']
             });
@@ -93,4 +128,5 @@
         }
     </script>
 </body>
+
 </html>
