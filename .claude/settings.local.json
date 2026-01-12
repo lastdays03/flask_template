@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(brainstorming)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Skill(writing-plans)"
+    ]
+  }
+}

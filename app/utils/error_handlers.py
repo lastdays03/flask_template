@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask_jwt_extended.exceptions import NoAuthorizationError
 
 def register_error_handlers(app):
