@@ -167,7 +167,7 @@ def register_jwt_error_handlers(jwt):
         )
 
     @jwt.revoked_token_loader
-    def revoked_token_callback(jwt_header, jwt_payload):
+    def revoked_token_callback(_jwt_header, _jwt_payload):
         return (
             jsonify(
                 {
@@ -186,7 +186,7 @@ def register_api_error_handlers(api):
     """Register Flask-RestX API error handlers."""
 
     @api.errorhandler(NoAuthorizationError)
-    def handle_auth_error(error):
+    def handle_auth_error(_error):
         return {
             "success": False,
             "error": {
@@ -196,7 +196,7 @@ def register_api_error_handlers(api):
         }, 401
 
     @api.errorhandler(ExpiredSignatureError)
-    def handle_expired_error(error):
+    def handle_expired_error(_error):
         return {
             "success": False,
             "error": {"code": "TOKEN_EXPIRED", "message": "Token has expired"},

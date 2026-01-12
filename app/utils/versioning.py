@@ -1,7 +1,7 @@
 """API versioning utilities."""
 
 from functools import wraps
-from flask import request, jsonify
+from flask import request
 
 
 def api_version_required(min_version="1.0", max_version="2.0"):

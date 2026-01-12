@@ -2,9 +2,11 @@
 
 import json
 import hashlib
+import pickle
 from functools import wraps
 from flask import current_app
 import redis
+from app.utils.metrics import cache_hits, cache_misses
 
 
 def get_redis_client():
@@ -18,9 +20,6 @@ def cache_key(*args, **kwargs):
     return hashlib.md5(key_data.encode()).hexdigest()
 
 
-from app.utils.metrics import cache_hits, cache_misses
-
-import pickle
 
 
 def cached(ttl=300, key_prefix=""):
@@ -63,6 +62,7 @@ def cached(ttl=300, key_prefix=""):
 
                 return result
             except Exception as e:
+                # pylint: disable=broad-exception-caught
                 # If cache fails, just execute function
                 current_app.logger.error(f"Cache error: {e}")
                 return func(*args, **kwargs)
