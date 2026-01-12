@@ -10,7 +10,7 @@ def test_users_pagination(client, auth_headers, db_session):
         user = User(
             email=f"pagetest{i}@test.com", first_name="Test", last_name=f"User{i}"
         )
-        user.set_password("password")
+        user.set_password("StrongPass1!")
         user.save()
 
     # Test first page

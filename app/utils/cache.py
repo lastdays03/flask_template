@@ -37,6 +37,10 @@ def cached(ttl=300, key_prefix=""):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            # Bypass cache in testing
+            if current_app.config.get("TESTING"):
+                return func(*args, **kwargs)
+
             # Generate cache key
             cache_key_str = f"{key_prefix}:{func.__name__}:{cache_key(*args, **kwargs)}"
 

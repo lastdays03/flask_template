@@ -1,7 +1,5 @@
 """Authentication API tests."""
 
-import pytest
-
 
 def test_register_success(client, db_session):
     """Test successful user registration."""
@@ -9,7 +7,7 @@ def test_register_success(client, db_session):
         "/api/v1/auth/register",
         json={
             "email": "newuser@example.com",
-            "password": "password123",
+            "password": "StrongPass1!",
             "first_name": "New",
             "last_name": "User",
         },
@@ -27,7 +25,7 @@ def test_register_duplicate_email(client, sample_user):
         "/api/v1/auth/register",
         json={
             "email": "test@example.com",
-            "password": "password123",
+            "password": "StrongPass1!",
             "first_name": "Test",
             "last_name": "User",
         },
@@ -40,7 +38,7 @@ def test_login_success(client, sample_user):
     """Test successful login."""
     response = client.post(
         "/api/v1/auth/login",
-        json={"email": "test@example.com", "password": "password123"},
+        json={"email": "test@example.com", "password": "StrongPass1!"},
     )
 
     assert response.status_code == 200

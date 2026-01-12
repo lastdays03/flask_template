@@ -41,7 +41,7 @@ def db_session(app):
 def sample_user(db_session):
     """Create sample user."""
     user = User(email="test@example.com", first_name="Test", last_name="User")
-    user.set_password("password123")
+    user.set_password("StrongPass1!")
     user.save()
     return user
 
@@ -51,7 +51,7 @@ def auth_headers(client, sample_user):
     """Get authentication headers."""
     response = client.post(
         "/api/v1/auth/login",
-        json={"email": "test@example.com", "password": "password123"},
+        json={"email": "test@example.com", "password": "StrongPass1!"},
     )
 
     data = response.get_json()
