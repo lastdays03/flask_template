@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: glitchtip
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: glitchtip
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - glitchtip_net
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    networks:
+      - glitchtip_net
+
+  web:
+    image: glitchtip/glitchtip:latest
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.example
+    environment:
+      - DATABASE_URL=postgres://glitchtip:password@postgres:5432/glitchtip
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=change_me_in_production_random_string_at_least_32_chars
+    restart: unless-stopped
+    networks:
+      - glitchtip_net
+
+  worker:
+    image: glitchtip/glitchtip:latest
+    command: ./bin/run-celery.sh
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env.example
+    environment:
+      - DATABASE_URL=postgres://glitchtip:password@postgres:5432/glitchtip
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=change_me_in_production_random_string_at_least_32_chars
+    restart: unless-stopped
+    networks:
+      - glitchtip_net
+
+volumes:
+  postgres_data:
+
+
+networks:
+  glitchtip_net:
+    driver: bridge

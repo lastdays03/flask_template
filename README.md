@@ -189,8 +189,17 @@ pytest --cov=app tests/
 ## 모니터링 및 관측성
 
 1. **Prometheus**: `/metrics` 엔드포인트를 통해 Flask 및 시스템 메트릭을 노출합니다.
-2. **Sentry**: 애플리케이션 예외 발생 시 자동으로 Sentry로 에러 리포트를 전송합니다.
+2. **Sentry / GlitchTip**: 애플리케이션 예외 발생 시 자동으로 에러 리포트를 전송합니다.
+   - **GlitchTip Self-Hosted 가이드**: [docs/USAGE_GLITCHTIP.md](docs/USAGE_GLITCHTIP.md) (Docker Compose 분리 배포)
 3. **Flower**: `http://localhost/flower/`에서 비동기 작업 처리 현황을 실시간으로 모니터링할 수 있습니다.
+
+## WebSocket 실시간 통신
+
+- 클라이언트: `examples/websocket_client.html`
+- 기능:
+  - JWT 인증 기반 연결
+  - 실시간 메시지 송수신 (ACK 지원)
+  - 송신(Sent) 및 수신(Received) 로그 UI 분리
 
 ## 라이선스 (License)
 
