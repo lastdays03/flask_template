@@ -1,10 +1,11 @@
 """Health check API."""
 
 from datetime import datetime
+import redis
 from flask import current_app
 from flask_restx import Namespace, Resource
-from app.extensions import db
-import redis
+from sqlalchemy import text
+from app.extensions import db, celery
 
 api = Namespace("health", description="Health check operations")
 
@@ -15,8 +16,6 @@ class HealthCheck(Resource):
 
     def get(self):
         """Check service health."""
-        from sqlalchemy import text
-
         status = {
             "status": "healthy",
             "timestamp": datetime.utcnow().isoformat(),
@@ -45,8 +44,6 @@ class HealthCheck(Resource):
 
         # Check Celery (basic check)
         try:
-            from app.extensions import celery
-
             inspect = celery.control.inspect()
             if inspect.active() is not None:
                 status["services"]["celery"] = "ok"

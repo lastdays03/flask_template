@@ -34,7 +34,7 @@ class OAuthService:
         session = OAuthService.get_google_oauth_session()
 
         # Exchange code for token
-        token = session.fetch_token("https://oauth2.googleapis.com/token", code=code)
+        _token = session.fetch_token("https://oauth2.googleapis.com/token", code=code)
 
         # Get user info
         resp = session.get("https://www.googleapis.com/oauth2/v1/userinfo")

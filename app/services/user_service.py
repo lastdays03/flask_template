@@ -16,6 +16,7 @@ class UserService:
 
         Returns pagination object.
         """
+        # pylint: disable=import-outside-toplevel
         from app.utils.pagination import Pagination
 
         pagination = User.query.filter_by(is_active=True).paginate(

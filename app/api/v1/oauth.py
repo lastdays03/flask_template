@@ -14,7 +14,7 @@ class GoogleLogin(Resource):
     @api.response(302, "Redirect to Google")
     def get(self):
         """Redirect to Google OAuth."""
-        auth_url, state = OAuthService.get_google_auth_url()
+        auth_url, _state = OAuthService.get_google_auth_url()
         return redirect(auth_url)
 
 

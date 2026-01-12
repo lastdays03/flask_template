@@ -47,8 +47,8 @@ class UserListV2(Resource):
         page = request.args.get("page", 1, type=int)
         per_page = request.args.get("per_page", 10, type=int)
 
-        if page < 1:
-            page = 1
+        # Validate page number
+        page = max(page, 1)
         if per_page < 1:
             per_page = 10
 
