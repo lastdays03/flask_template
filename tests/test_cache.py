@@ -35,27 +35,35 @@ def test_cache_hit(app):
 def test_cache_expiration(app):
     """Test cache expiration."""
     with app.app_context():
+        original_testing = app.config["TESTING"]
         app.config["TESTING"] = False
-        result1 = expensive_operation(5)
-        assert result1 == 10
+        try:
+            result1 = expensive_operation(5)
+            assert result1 == 10
 
-        # Wait for cache to expire
-        time.sleep(2.1)
+            # Wait for cache to expire
+            time.sleep(2.1)
 
-        result2 = expensive_operation(5)
-        assert result2 == 10
+            result2 = expensive_operation(5)
+            assert result2 == 10
+        finally:
+            app.config["TESTING"] = original_testing
 
 
 def test_cache_invalidation(app):
     """Test cache invalidation."""
     with app.app_context():
+        original_testing = app.config["TESTING"]
         app.config["TESTING"] = False
-        expensive_operation(5)
+        try:
+            expensive_operation(5)
 
-        # Invalidate cache
-        count = invalidate_cache("test:*")
-        assert count >= 0
+            # Invalidate cache
+            count = invalidate_cache("test:*")
+            assert count >= 0
 
-        # Should recalculate
-        result = expensive_operation(5)
-        assert result == 10
+            # Should recalculate
+            result = expensive_operation(5)
+            assert result == 10
+        finally:
+            app.config["TESTING"] = original_testing
