@@ -1,6 +1,6 @@
 """Pagination utilities with HATEOAS support."""
 
-from flask import request, url_for
+from flask import url_for
 from urllib.parse import urlencode
 
 

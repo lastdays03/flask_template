@@ -32,7 +32,7 @@ def send_password_reset_email(self, user_id, token):
             raise ValueError(f"User {user_id} not found")
 
         # TODO: Implement actual email sending
-        print(f"Sending password reset email to {user.email}")
+        print(f"Sending password reset email to {user.email} with token {token}")
 
         return f"Password reset email sent to {user.email}"
 

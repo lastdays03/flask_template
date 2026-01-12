@@ -1,3 +1,4 @@
+"""User service module."""
 from app.models.user import User
 from app.extensions import db
 from app.utils.cache import cached, invalidate_cache
