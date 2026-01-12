@@ -199,6 +199,18 @@ docker compose logs -f
     ```
     - **CI 통과 기준**: 점수 **9.0** 이상
     - *참고: 로컬 환경 구성에 따라 `import-error`로 점수가 낮게 나올 수 있습니다. 이 경우 소스 코드의 로직/스타일 경고를 우선적으로 해결해 주세요.*
+
+ 4. **Git Hook 설정 (Pre-push Lint)**
+    
+    Git 서버에 푸시하기 전에 자동으로 코드를 검사하도록 훅을 설치합니다.
+    
+    ```bash
+    # pre-commit 설치 및 훅 설정
+    pip install -r requirements-dev.txt
+    pre-commit install --hook-type pre-push
+    ```
+    
+    설정이 완료되면 `git push` 실행 시 자동으로 Black과 Flake8 검사가 수행됩니다. 검사에 실패하면 푸시가 거부됩니다.
  
  ## 테스트 (Testing)
  
