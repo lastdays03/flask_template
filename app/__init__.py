@@ -111,6 +111,11 @@ def create_app(config_name="default"):
     def index():
         return jsonify({"message": "Flask REST API", "documentation": "/api"})
 
+    @flask_app.route("/api/health")
+    def health_check():
+        """Global health check."""
+        return jsonify({"status": "healthy"}), 200
+
     # Register Error Handlers
     from app.utils.error_handlers import (
         register_error_handlers,

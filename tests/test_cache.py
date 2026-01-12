@@ -15,6 +15,9 @@ def expensive_operation(x):
 def test_cache_hit(app):
     """Test cache hit."""
     with app.app_context():
+        # Enable caching for this test
+        app.config["TESTING"] = False
+        
         # First call - cache miss
         start = time.time()
         result1 = expensive_operation(5)
@@ -32,6 +35,7 @@ def test_cache_hit(app):
 def test_cache_expiration(app):
     """Test cache expiration."""
     with app.app_context():
+        app.config["TESTING"] = False
         result1 = expensive_operation(5)
         assert result1 == 10
 
@@ -45,6 +49,7 @@ def test_cache_expiration(app):
 def test_cache_invalidation(app):
     """Test cache invalidation."""
     with app.app_context():
+        app.config["TESTING"] = False
         expensive_operation(5)
 
         # Invalidate cache
