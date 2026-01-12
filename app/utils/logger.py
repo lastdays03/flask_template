@@ -14,8 +14,7 @@ def setup_logging(app):
 
     # JSON formatter
     json_formatter = jsonlogger.JsonFormatter(
-        '%(timestamp)s %(level)s %(name)s %(message)s',
-        rename_fields={'levelname': 'level', 'asctime': 'timestamp'}
+        '%(asctime)s %(levelname)s %(name)s %(message)s'
     )
 
     # File handler for all logs

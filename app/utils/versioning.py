@@ -15,8 +15,13 @@ def api_version_required(min_version='1.0', max_version='2.0'):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # Get version from header
-            version = request.headers.get('API-Version', '1.0')
+            # Get version from header or path
+            version = request.headers.get('API-Version')
+            if not version:
+                if '/api/v2' in request.path:
+                    version = '2.0'
+                else:
+                    version = '1.0'
 
             try:
                 version_float = float(version)

@@ -16,7 +16,8 @@ class UserListV2(Resource):
     @api_version_required(min_version='2.0')
     @api.doc(params={
         'page': {'description': 'Page number', 'type': 'integer', 'default': 1},
-        'per_page': {'description': 'Items per page', 'type': 'integer', 'default': 10}
+        'per_page': {'description': 'Items per page', 'type': 'integer', 'default': 10},
+        'API-Version': {'in': 'header', 'description': 'API Version', 'default': '2.0', 'required': False}
     })
     @api.response(200, 'Success')
     def get(self):
