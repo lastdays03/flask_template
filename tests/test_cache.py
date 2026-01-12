@@ -1,7 +1,7 @@
 """Cache tests."""
 
 import time
-import pytest
+
 from app.utils.cache import cached, invalidate_cache
 
 
@@ -17,7 +17,7 @@ def test_cache_hit(app):
     with app.app_context():
         # Enable caching for this test
         app.config["TESTING"] = False
-        
+
         # First call - cache miss
         start = time.time()
         result1 = expensive_operation(5)
