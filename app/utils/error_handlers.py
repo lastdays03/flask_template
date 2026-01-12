@@ -1,5 +1,6 @@
 from flask import jsonify
 from flask_jwt_extended.exceptions import NoAuthorizationError
+from jwt.exceptions import ExpiredSignatureError
 
 def register_error_handlers(app):
     """Register standard Flask error handlers."""
@@ -142,5 +143,15 @@ def register_api_error_handlers(api):
             'error': {
                 'code': 'UNAUTHORIZED',
                 'message': 'Missing Authorization Header'
+            }
+        }, 401
+
+    @api.errorhandler(ExpiredSignatureError)
+    def handle_expired_error(error):
+        return {
+            'success': False,
+            'error': {
+                'code': 'TOKEN_EXPIRED',
+                'message': 'Token has expired'
             }
         }, 401
