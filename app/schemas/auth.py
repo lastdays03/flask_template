@@ -1,4 +1,5 @@
 """Authentication schemas."""
+
 from flask_restx import fields, Namespace
 
 api = Namespace("auth", description="Authentication operations")

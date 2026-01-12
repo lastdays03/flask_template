@@ -1,4 +1,5 @@
 """Gunicorn configuration."""
+
 import multiprocessing
 
 # Server socket

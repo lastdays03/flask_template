@@ -1,4 +1,5 @@
 """User API v2 tests."""
+
 import pytest
 
 

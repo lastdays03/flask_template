@@ -1,4 +1,5 @@
 """OAuth API endpoints."""
+
 from flask import request, redirect
 from flask_restx import Namespace, Resource
 from app.services.oauth_service import OAuthService

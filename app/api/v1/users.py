@@ -1,4 +1,5 @@
 """Users API."""
+
 from flask import request, jsonify, make_response
 from flask_restx import Resource, Namespace
 from flask_jwt_extended import jwt_required

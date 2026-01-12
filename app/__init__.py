@@ -1,4 +1,5 @@
 """Application factory."""
+
 import logging
 from flask import Flask, jsonify
 from flask_restx import Api

@@ -1,4 +1,5 @@
 """WSGI entry point for production."""
+
 import os
 from app import create_app
 

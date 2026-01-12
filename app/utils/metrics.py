@@ -1,4 +1,5 @@
 """Prometheus metrics."""
+
 from prometheus_client import Counter, Histogram, Gauge, Info
 from prometheus_flask_exporter import PrometheusMetrics
 

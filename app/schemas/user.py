@@ -1,4 +1,5 @@
 """User schemas."""
+
 from flask_restx import fields, Namespace
 
 api = Namespace("users", description="User operations")

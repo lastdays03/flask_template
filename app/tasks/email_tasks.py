@@ -1,4 +1,5 @@
 """Email tasks."""
+
 from app.extensions import celery
 from app.models.user import User
 

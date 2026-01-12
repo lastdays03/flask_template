@@ -1,4 +1,5 @@
 """API version deprecation middleware."""
+
 from flask import request, g
 import warnings
 

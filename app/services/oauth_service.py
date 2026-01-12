@@ -1,4 +1,5 @@
 """OAuth service."""
+
 import os
 from authlib.integrations.requests_client import OAuth2Session
 from flask import current_app

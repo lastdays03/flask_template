@@ -1,4 +1,5 @@
 """Authentication API tests."""
+
 import pytest
 
 

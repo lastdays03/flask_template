@@ -1,4 +1,5 @@
 """Celery worker entry point."""
+
 import os
 from app import create_app
 from app.extensions import celery

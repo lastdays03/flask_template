@@ -1,4 +1,5 @@
 """WebSocket event handlers."""
+
 import logging
 from flask import current_app
 from flask_socketio import emit, join_room

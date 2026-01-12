@@ -1,4 +1,5 @@
 """Pagination utilities with HATEOAS support."""
+
 from flask import request, url_for
 from urllib.parse import urlencode
 
@@ -80,12 +81,16 @@ def paginate_response(pagination, data, endpoint, **kwargs):
             "self": _build_url(endpoint, page=pagination.page, **params),
             "first": _build_url(endpoint, page=1, **params),
             "last": _build_url(endpoint, page=pagination.pages, **params),
-            "next": _build_url(endpoint, page=pagination.next_num, **params)
-            if pagination.has_next
-            else None,
-            "prev": _build_url(endpoint, page=pagination.prev_num, **params)
-            if pagination.has_prev
-            else None,
+            "next": (
+                _build_url(endpoint, page=pagination.next_num, **params)
+                if pagination.has_next
+                else None
+            ),
+            "prev": (
+                _build_url(endpoint, page=pagination.prev_num, **params)
+                if pagination.has_prev
+                else None
+            ),
         },
     }
 

@@ -1,4 +1,5 @@
 """Caching utilities."""
+
 import json
 import hashlib
 from functools import wraps

@@ -1,4 +1,5 @@
 """Metrics API endpoint."""
+
 from flask import Response
 from flask_restx import Namespace, Resource
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST

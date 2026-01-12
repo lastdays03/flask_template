@@ -1,4 +1,5 @@
 """Health check API."""
+
 from datetime import datetime
 from flask import current_app
 from flask_restx import Namespace, Resource

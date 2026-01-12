@@ -1,4 +1,5 @@
 """Cache tests."""
+
 import time
 import pytest
 from app.utils.cache import cached, invalidate_cache

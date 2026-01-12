@@ -1,4 +1,5 @@
 """API v2."""
+
 from flask import Blueprint
 from flask_restx import Api
 from app.api.v2.users import api as users_ns

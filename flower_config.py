@@ -1,4 +1,5 @@
 """Flower configuration."""
+
 import os
 
 # Celery broker URL

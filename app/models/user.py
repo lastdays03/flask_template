@@ -1,4 +1,5 @@
 """User model."""
+
 from datetime import datetime
 from passlib.hash import bcrypt
 from app.extensions import db
