@@ -174,17 +174,41 @@ docker-compose logs -f
 - **API Server**: http://localhost (Nginx 80포트)
 - **Flower Dashboard**: http://localhost/flower/ (Celery 모니터링)
 
-## 테스트 (Testing)
-
-GitHub Actions CI 파이프라인이 구성되어 있습니다. 로컬에서 테스트를 실행하려면:
-
-```bash
-# 전체 테스트 실행
-pytest -v
-
-# 커버리지 리포트
-pytest --cov=app tests/
-```
+## 개발 가이드 (Development Guide)
+ 
+ **코드 품질 관리 (Linting & Formatting)**
+ 
+ 본 프로젝트는 CI 파이프라인에서 엄격한 코드 품질 검사를 수행합니다. Pull Request 제출 전 반드시 로컬에서 린트를 통과해야 합니다.
+ 
+ 1. **개발 의존성 설치**
+    ```bash
+    pip install -r requirements-dev.txt
+    ```
+ 
+ 2. **코드 포맷팅 (Black)**
+    ```bash
+    # 포맷팅 실행 (파일 자동 수정)
+    black .
+    ```
+ 
+ 3. **정적 분석 (Pylint)**
+    ```bash
+    # 린트 검사 실행
+    pylint app
+    ```
+    - CI 통과 기준: 점수 **9.0** 이상
+ 
+ ## 테스트 (Testing)
+ 
+ GitHub Actions CI 파이프라인이 구성되어 있습니다. 로컬에서 테스트를 실행하려면:
+ 
+ ```bash
+ # 전체 테스트 실행
+ pytest -v
+ 
+ # 커버리지 리포트
+ pytest --cov=app tests/
+ ```
 
 ## 모니터링 및 관측성
 
