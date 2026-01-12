@@ -57,6 +57,8 @@ def handle_subscribe(data):
 @socketio.on('send_message')
 def handle_message(data):
     """Handle incoming message."""
+    logger.info(f"Received message event: {data}")
+
     message = data.get('message')
     room = data.get('room', 'general')
 
@@ -64,6 +66,13 @@ def handle_message(data):
         'message': message,
         'room': room
     }, room=room)
+
+    # Acknowledge to sender
+    emit('message_sent_ack', {
+        'status': 'success',
+        'echo': message,
+        'room': room
+    })
 
 
 def send_notification_to_user(user_id, message):
