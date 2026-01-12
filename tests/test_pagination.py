@@ -1,8 +1,11 @@
 """Pagination tests."""
 
+from app.utils.cache import invalidate_cache
+
 
 def test_users_pagination(client, auth_headers, db_session):
     """Test users pagination."""
+    invalidate_cache("user_list:*")
     # Create test users
     from app.models.user import User
 
