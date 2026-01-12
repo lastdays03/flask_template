@@ -5,10 +5,10 @@ from app.extensions import db
 from app.models.user import User
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def app():
     """Create Flask app for testing."""
-    application = create_app('testing')
+    application = create_app("testing")
 
     with application.app_context():
         db.create_all()
@@ -16,13 +16,13 @@ def app():
         db.drop_all()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def client(app):
     """Create test client."""
     return app.test_client()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def db_session(app):
     """Create database session for testing."""
     with app.app_context():
@@ -36,30 +36,24 @@ def db_session(app):
         db.session.rollback()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def sample_user(db_session):
     """Create sample user."""
-    user = User(
-        email='test@example.com',
-        first_name='Test',
-        last_name='User'
-    )
-    user.set_password('password123')
+    user = User(email="test@example.com", first_name="Test", last_name="User")
+    user.set_password("password123")
     user.save()
     return user
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def auth_headers(client, sample_user):
     """Get authentication headers."""
-    response = client.post('/api/v1/auth/login', json={
-        'email': 'test@example.com',
-        'password': 'password123'
-    })
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "test@example.com", "password": "password123"},
+    )
 
     data = response.get_json()
-    access_token = data['access_token']
+    access_token = data["access_token"]
 
-    return {
-        'Authorization': f'Bearer {access_token}'
-    }
+    return {"Authorization": f"Bearer {access_token}"}

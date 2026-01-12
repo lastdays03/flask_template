@@ -23,31 +23,31 @@ def generate_pagination_links(pagination, endpoint, **kwargs):
     params = {k: v for k, v in kwargs.items() if v is not None}
 
     # First page
-    first_params = {**params, 'page': 1}
+    first_params = {**params, "page": 1}
     links.append(f'<{_build_url(endpoint, **first_params)}>; rel="first"')
 
     # Previous page
     if pagination.has_prev:
-        prev_params = {**params, 'page': pagination.prev_num}
+        prev_params = {**params, "page": pagination.prev_num}
         links.append(f'<{_build_url(endpoint, **prev_params)}>; rel="prev"')
 
     # Next page
     if pagination.has_next:
-        next_params = {**params, 'page': pagination.next_num}
+        next_params = {**params, "page": pagination.next_num}
         links.append(f'<{_build_url(endpoint, **next_params)}>; rel="next"')
 
     # Last page
-    last_params = {**params, 'page': pagination.pages}
+    last_params = {**params, "page": pagination.pages}
     links.append(f'<{_build_url(endpoint, **last_params)}>; rel="last"')
 
-    return ', '.join(links)
+    return ", ".join(links)
 
 
 def _build_url(endpoint, **params):
     """Build URL with query parameters."""
     base_url = url_for(endpoint, _external=True)
     query_string = urlencode({k: v for k, v in params.items() if v is not None})
-    return f'{base_url}?{query_string}' if query_string else base_url
+    return f"{base_url}?{query_string}" if query_string else base_url
 
 
 def paginate_response(pagination, data, endpoint, **kwargs):
@@ -64,25 +64,29 @@ def paginate_response(pagination, data, endpoint, **kwargs):
         dict: Paginated response with HATEOAS links
     """
     params = {k: v for k, v in kwargs.items() if v is not None}
-    params['per_page'] = pagination.per_page
+    params["per_page"] = pagination.per_page
 
     return {
-        'data': data,
-        'meta': {
-            'page': pagination.page,
-            'per_page': pagination.per_page,
-            'total': pagination.total,
-            'pages': pagination.pages,
-            'has_next': pagination.has_next,
-            'has_prev': pagination.has_prev,
+        "data": data,
+        "meta": {
+            "page": pagination.page,
+            "per_page": pagination.per_page,
+            "total": pagination.total,
+            "pages": pagination.pages,
+            "has_next": pagination.has_next,
+            "has_prev": pagination.has_prev,
         },
-        'links': {
-            'self': _build_url(endpoint, page=pagination.page, **params),
-            'first': _build_url(endpoint, page=1, **params),
-            'last': _build_url(endpoint, page=pagination.pages, **params),
-            'next': _build_url(endpoint, page=pagination.next_num, **params) if pagination.has_next else None,
-            'prev': _build_url(endpoint, page=pagination.prev_num, **params) if pagination.has_prev else None,
-        }
+        "links": {
+            "self": _build_url(endpoint, page=pagination.page, **params),
+            "first": _build_url(endpoint, page=1, **params),
+            "last": _build_url(endpoint, page=pagination.pages, **params),
+            "next": _build_url(endpoint, page=pagination.next_num, **params)
+            if pagination.has_next
+            else None,
+            "prev": _build_url(endpoint, page=pagination.prev_num, **params)
+            if pagination.has_prev
+            else None,
+        },
     }
 
 
@@ -126,10 +130,14 @@ class Pagination:
         """Iterate over pages (compatibility with SQLAlchemy Pagination)."""
         last = 0
         for num in range(1, self.pages + 1):
-            if num <= left_edge or \
-               (num > self.page - left_current - 1 and \
-                num < self.page + right_current) or \
-               num > self.pages - right_edge:
+            if (
+                num <= left_edge
+                or (
+                    num > self.page - left_current - 1
+                    and num < self.page + right_current
+                )
+                or num > self.pages - right_edge
+            ):
                 if last + 1 != num:
                     yield None
                 yield num

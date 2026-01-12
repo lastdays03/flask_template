@@ -9,28 +9,24 @@ def setup_logging(app):
     """Set up application logging."""
 
     # Create logs directory if it doesn't exist
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
 
     # JSON formatter
     json_formatter = jsonlogger.JsonFormatter(
-        '%(asctime)s %(levelname)s %(name)s %(message)s'
+        "%(asctime)s %(levelname)s %(name)s %(message)s"
     )
 
     # File handler for all logs
     file_handler = RotatingFileHandler(
-        'logs/app.log',
-        maxBytes=10485760,  # 10MB
-        backupCount=5
+        "logs/app.log", maxBytes=10485760, backupCount=5  # 10MB
     )
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(json_formatter)
 
     # File handler for errors
     error_handler = RotatingFileHandler(
-        'logs/error.log',
-        maxBytes=10485760,  # 10MB
-        backupCount=5
+        "logs/error.log", maxBytes=10485760, backupCount=5  # 10MB
     )
     error_handler.setLevel(logging.ERROR)
     error_handler.setFormatter(json_formatter)
@@ -47,4 +43,4 @@ def setup_logging(app):
     app.logger.setLevel(logging.INFO)
 
     # Log startup
-    app.logger.info('Flask application started')
+    app.logger.info("Flask application started")

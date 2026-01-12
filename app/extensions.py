@@ -12,8 +12,5 @@ db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
 cors = CORS()
-limiter = Limiter(
-    key_func=get_remote_address,
-    default_limits=["100 per hour"]
-)
+limiter = Limiter(key_func=get_remote_address, default_limits=["100 per hour"])
 celery = Celery()

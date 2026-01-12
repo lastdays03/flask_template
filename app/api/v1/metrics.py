@@ -3,10 +3,10 @@ from flask import Response
 from flask_restx import Namespace, Resource
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
-api = Namespace('metrics', description='Prometheus metrics')
+api = Namespace("metrics", description="Prometheus metrics")
 
 
-@api.route('')
+@api.route("")
 class Metrics(Resource):
     """Prometheus metrics endpoint."""
 
@@ -17,7 +17,4 @@ class Metrics(Resource):
 
         Returns metrics in Prometheus text format.
         """
-        return Response(
-            generate_latest(),
-            mimetype=CONTENT_TYPE_LATEST
-        )
+        return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)

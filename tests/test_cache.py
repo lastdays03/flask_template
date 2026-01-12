@@ -4,7 +4,7 @@ import pytest
 from app.utils.cache import cached, invalidate_cache
 
 
-@cached(ttl=2, key_prefix='test')
+@cached(ttl=2, key_prefix="test")
 def expensive_operation(x):
     """Simulate expensive operation."""
     time.sleep(0.1)
@@ -47,7 +47,7 @@ def test_cache_invalidation(app):
         expensive_operation(5)
 
         # Invalidate cache
-        count = invalidate_cache('test:*')
+        count = invalidate_cache("test:*")
         assert count >= 0
 
         # Should recalculate

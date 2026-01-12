@@ -8,7 +8,7 @@ from app.models.base import BaseModel
 class User(BaseModel):
     """User model."""
 
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -28,14 +28,16 @@ class User(BaseModel):
     def to_dict(self):
         """Convert user to dictionary."""
         data = super().to_dict()
-        data.update({
-            'email': self.email,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'is_active': self.is_active,
-            'last_login': self.last_login.isoformat() if self.last_login else None
-        })
+        data.update(
+            {
+                "email": self.email,
+                "first_name": self.first_name,
+                "last_name": self.last_name,
+                "is_active": self.is_active,
+                "last_login": self.last_login.isoformat() if self.last_login else None,
+            }
+        )
         return data
 
     def __repr__(self):
-        return f'<User {self.email}>'
+        return f"<User {self.email}>"

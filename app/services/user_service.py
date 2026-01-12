@@ -7,7 +7,7 @@ class UserService:
     """User service."""
 
     @staticmethod
-    @cached(ttl=60, key_prefix='user_list')
+    @cached(ttl=60, key_prefix="user_list")
     def get_users(page=1, per_page=10):
         """
         Get paginated list of users.
@@ -17,9 +17,7 @@ class UserService:
         from app.utils.pagination import Pagination
 
         pagination = User.query.filter_by(is_active=True).paginate(
-            page=page,
-            per_page=per_page,
-            error_out=False
+            page=page, per_page=per_page, error_out=False
         )
 
         # Detach items from session to make them pickleable
@@ -31,7 +29,7 @@ class UserService:
             items=items,
             page=pagination.page,
             per_page=pagination.per_page,
-            total=pagination.total
+            total=pagination.total,
         )
 
     @staticmethod
@@ -39,7 +37,7 @@ class UserService:
         """Get user by ID."""
         user = User.query.get(user_id)
         if not user or not user.is_active:
-            raise ValueError('User not found')
+            raise ValueError("User not found")
         return user
 
     @staticmethod
@@ -47,28 +45,28 @@ class UserService:
         """Update user information."""
         user = User.query.get(user_id)
         if not user:
-            raise ValueError('User not found')
+            raise ValueError("User not found")
 
-        if 'first_name' in data:
-            user.first_name = data['first_name']
-        if 'last_name' in data:
-            user.last_name = data['last_name']
-        
+        if "first_name" in data:
+            user.first_name = data["first_name"]
+        if "last_name" in data:
+            user.last_name = data["last_name"]
+
         # Check email uniqueness if email is being updated
-        if 'email' in data and data['email'] != user.email:
-            existing = User.query.filter_by(email=data['email']).first()
+        if "email" in data and data["email"] != user.email:
+            existing = User.query.filter_by(email=data["email"]).first()
             if existing:
-                raise ValueError('Email already in use')
-            user.email = data['email']
-            
-        if 'password' in data:
-            user.set_password(data['password'])
+                raise ValueError("Email already in use")
+            user.email = data["email"]
+
+        if "password" in data:
+            user.set_password(data["password"])
 
         db.session.commit()
-        
+
         # Invalidate cache
-        invalidate_cache('user_list:*')
-        
+        invalidate_cache("user_list:*")
+
         return user
 
     @staticmethod
@@ -76,12 +74,12 @@ class UserService:
         """Soft delete user."""
         user = User.query.get(user_id)
         if not user:
-            raise ValueError('User not found')
+            raise ValueError("User not found")
 
         user.is_active = False
         db.session.commit()
-        
+
         # Invalidate cache
-        invalidate_cache('user_list:*')
-        
+        invalidate_cache("user_list:*")
+
         return user
