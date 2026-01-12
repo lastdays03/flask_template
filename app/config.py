@@ -46,6 +46,7 @@ class BaseConfig:
     RATELIMIT_STORAGE_URL = os.getenv(
         "RATELIMIT_STORAGE_URL", "redis://localhost:6379/2"
     )
+    RATELIMIT_DEFAULT = "200 per day;50 per hour"
 
 
 class DevelopmentConfig(BaseConfig):
