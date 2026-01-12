@@ -51,26 +51,26 @@ class UserListV2(Resource):
         )
         
         # Add additional metadata for v2
+        response_data['success'] = True
         response_data['metadata'] = {
             'version': '2.0',
             'response_time_ms': round((time.time() - start_time) * 1000, 2)
         }
 
-        # Create response object
-        response = make_response(jsonify(response_data), 200)
-
-        # Add Link header (RFC 5988)
+        # Generate Link header (RFC 5988)
         link_header = generate_pagination_links(
             pagination,
             'api_v2.users_user_list_v2',
             per_page=per_page
         )
-        response.headers['Link'] = link_header
 
-        # Add custom pagination headers
-        response.headers['X-Total-Count'] = str(pagination.total)
-        response.headers['X-Page'] = str(pagination.page)
-        response.headers['X-Per-Page'] = str(pagination.per_page)
-        response.headers['X-Total-Pages'] = str(pagination.pages)
+        # Prepare headers
+        headers = {
+            'Link': link_header,
+            'X-Total-Count': str(pagination.total),
+            'X-Page': str(pagination.page),
+            'X-Per-Page': str(pagination.per_page),
+            'X-Total-Pages': str(pagination.pages)
+        }
 
-        return response
+        return response_data, 200, headers

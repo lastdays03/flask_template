@@ -24,23 +24,23 @@ def api_version_required(min_version='1.0', max_version='2.0'):
                 max_float = float(max_version)
 
                 if version_float < min_float or version_float > max_float:
-                    return jsonify({
+                    return {
                         'success': False,
                         'error': {
                             'code': 'UNSUPPORTED_API_VERSION',
                             'message': f'API version {version} not supported',
                             'supported_versions': f'{min_version} - {max_version}'
                         }
-                    }), 400
+                    }, 400
 
             except ValueError:
-                return jsonify({
+                return {
                     'success': False,
                     'error': {
                         'code': 'INVALID_API_VERSION',
                         'message': f'Invalid API version format: {version}'
                     }
-                }), 400
+                }, 400
 
             return func(*args, **kwargs)
         return wrapper

@@ -19,6 +19,8 @@ def cache_key(*args, **kwargs):
 
 from app.utils.metrics import cache_hits, cache_misses
 
+import pickle
+
 def cached(ttl=300, key_prefix=''):
     """
     Cache decorator for expensive operations.
@@ -46,13 +48,13 @@ def cached(ttl=300, key_prefix=''):
                 if cached_result:
                     current_app.logger.info(f'Cache hit: {cache_key_str}')
                     cache_hits.labels(cache_type=key_prefix or 'default').inc()
-                    return json.loads(cached_result)
+                    return pickle.loads(cached_result)
 
                 # Execute function
                 result = func(*args, **kwargs)
 
                 # Store in cache
-                r.setex(cache_key_str, ttl, json.dumps(result, default=str))
+                r.setex(cache_key_str, ttl, pickle.dumps(result))
                 current_app.logger.info(f'Cache miss: {cache_key_str}')
                 cache_misses.labels(cache_type=key_prefix or 'default').inc()
 
