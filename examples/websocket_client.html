@@ -60,6 +60,12 @@
             <button onclick="disconnect()">Disconnect</button>
         </div>
 
+        <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 20px;">
+            <h3>Test Messaging</h3>
+            <input type="text" id="messageInput" placeholder="Type a message..." style="width: 70%;">
+            <button onclick="sendMessage()">Send Test Message</button>
+        </div>
+
         <div style="margin-top: 20px;">
             <h3>Messages</h3>
             <div id="messages"></div>
@@ -96,6 +102,10 @@
                 addMessage('Server', data.message);
             });
 
+            socket.on('new_message', (data) => {
+                addMessage('User', `${data.message} (Room: ${data.room})`);
+            });
+
             socket.on('notification', (data) => {
                 addMessage('Notification', data.message);
             });
@@ -115,6 +125,22 @@
         function disconnect() {
             if (socket) {
                 socket.disconnect();
+            }
+        }
+
+        function sendMessage() {
+            if (!socket) {
+                alert('Not connected!');
+                return;
+            }
+            const input = document.getElementById('messageInput');
+            const message = input.value;
+            if (message) {
+                socket.emit('send_message', {
+                    message: message,
+                    room: 'general'
+                });
+                input.value = '';
             }
         }
 
