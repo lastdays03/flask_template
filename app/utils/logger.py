@@ -37,10 +37,29 @@ def setup_logging(app):
     stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(json_formatter)
 
+    # Sensitive Data Filter
+    class SensitiveDataFilter(logging.Filter):
+        """Filter to mask sensitive data."""
+
+        def filter(self, record):
+            msg = record.msg
+            if isinstance(msg, dict):
+                for key in ["password", "token", "secret", "access_token", "refresh_token"]:
+                    if key in msg:
+                        msg[key] = "***MASKED***"
+            return True
+
+    sensitive_filter = SensitiveDataFilter()
+
     # Configure app logger
     app.logger.addHandler(file_handler)
     app.logger.addHandler(error_handler)
     app.logger.addHandler(stream_handler)
+    
+    app.logger.addFilter(sensitive_filter)
+    file_handler.addFilter(sensitive_filter)
+    stream_handler.addFilter(sensitive_filter)
+
     app.logger.setLevel(logging.INFO)
 
     # Log startup
