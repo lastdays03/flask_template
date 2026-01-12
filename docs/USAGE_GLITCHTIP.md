@@ -17,7 +17,7 @@ GlitchTip은 Sentry 오픈소스 호환 구현체로, 애플리케이션의 에�
 
 ```bash
 cd monitoring
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 2.2 접속 확인
@@ -36,14 +36,14 @@ GlitchTip을 처음 실행하면 관리자(Superuser) 계정 생성이 필요합
 
 ```bash
 # monitoring 폴더에서 실행
-docker-compose run --rm web ./manage.py migrate
+docker compose run --rm web ./manage.py migrate
 ```
 
 그 다음, 관리자 계정을 생성합니다.
 
 ```bash
 # monitoring 폴더에서 실행
-docker-compose run --rm web ./manage.py createsuperuser
+docker compose run --rm web ./manage.py createsuperuser
 # Email: admin@localhost
 # Password: (임의 설정)
 ```
@@ -76,7 +76,7 @@ SENTRY_DSN=http://<복사한_public_key>@localhost:8000/1
 
 ```bash
 # 프로젝트 루트에서
-docker-compose up -d app
+docker compose up -d app
 ```
 
 ---

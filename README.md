@@ -96,7 +96,7 @@ cp .env.example .env
 MySQL, Redis 등 인프라 서비스를 Docker로 실행합니다.
 
 ```bash
-docker-compose up -d mysql redis
+docker compose up -d mysql redis
 ```
 
 ### 4. 데이터베이스 초기화
@@ -165,10 +165,10 @@ Docker Compose를 사용하여 전체 스택(App, Worker, Flower, Nginx, DB, Red
 
 ```bash
 # 서비스 빌드 및 실행
-docker-compose up --build -d
+docker compose up --build -d
 
 # 로그 확인
-docker-compose logs -f
+docker compose logs -f
 ```
 
 - **API Server**: http://localhost (Nginx 80포트)

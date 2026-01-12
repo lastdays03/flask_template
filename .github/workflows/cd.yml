@@ -54,8 +54,8 @@ jobs:
   #           git pull origin main
   #
   #           # 최신 Docker 이미지 풀링
-  #           docker-compose pull
+  #           docker compose pull
   #
   #           # 서비스 재시작 (Zero-downtime이 필요하면 Rolling Update 구성 필요)
-  #           docker-compose up -d
+  #           docker compose up -d
   #           docker image prune -f
