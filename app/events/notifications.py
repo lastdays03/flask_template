@@ -1,28 +1,41 @@
 """WebSocket event handlers."""
+import logging
+from flask import current_app
 from flask_socketio import emit, join_room
 from flask_jwt_extended import decode_token
 from app.websocket import socketio
+
+logger = logging.getLogger(__name__)
 
 
 @socketio.on('connect')
 def handle_connect(auth):
     """Handle client connection."""
     try:
+        logger.info(f"SocketIO Connect attempt. Auth data: {auth}")
+        
         # Verify JWT token (expecting auth dict with token)
         token = auth.get('token') if auth else None
         
         if token:
-            decoded = decode_token(token)
-            user_id = decoded['sub']  # This is the string user_id we set in auth_service
+            try:
+                decoded = decode_token(token)
+                user_id = decoded['sub']  # This is the string user_id we set in auth_service
+                logger.info(f"Token decoded successfully. User ID: {user_id}")
 
-            # Join user's personal room
-            join_room(f'user_{user_id}')
-            emit('connected', {'message': 'Connected successfully'})
-            return True
+                # Join user's personal room
+                join_room(f'user_{user_id}')
+                emit('connected', {'message': 'Connected successfully'})
+                logger.info("Connection accepted.")
+                return True
+            except Exception as e:
+                logger.error(f"Token decode failed: {e}")
+                return False
         else:
+            logger.warning("No token provided in auth data.")
             return False
     except Exception as e:
-        print(f'Connection error: {e}')
+        logger.error(f"Connection error: {e}")
         return False
 
 
