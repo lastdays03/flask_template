@@ -67,4 +67,5 @@ jobs:
       run: black --check .
 
     - name: Lint with Pylint
-      run: pylint app
+      run: |
+        pylint app --fail-under=9.0
