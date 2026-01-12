@@ -6,10 +6,10 @@ import os
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import pytest
-from app import create_app
-from app.extensions import db
-from app.models.user import User
+import pytest  # noqa: E402
+from app import create_app  # noqa: E402
+from app.extensions import db  # noqa: E402
+from app.models.user import User  # noqa: E402
 
 
 @pytest.fixture(scope="session")
