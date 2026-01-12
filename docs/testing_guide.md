@@ -1,183 +1,117 @@
-# Flask Template 기능별 상세 테스트 가이드
+# Flask Template 기능별 상세 테스트 가이드 (Docker & Swagger UI)
 
-이 문서는 Flask Production Template에 구현된 주요 확장 기능들을 직접 테스트하고 검증하는 방법을 단계별로 설명합니다.
+이 문서는 **Docker 환경**에서 서비스를 실행하고, **Swagger UI**와 **웹 브라우저**를 사용하여 구현된 기능들을 편리하게 테스트하는 방법을 안내합니다.
 
-## 사전 준비 (Prerequisites)
+## 1. 사전 준비 (Docker 실행)
 
-테스트를 진행하기 전에 로컬 개발 환경이 실행 중이어야 합니다.
+모든 서비스(App, MySQL, Redis, Worker, Flower, Nginx)를 Docker Compose로 실행합니다.
 
 ```bash
-# 1. 가상환경 활성화 (Python 기반 테스트 시)
-source venv/bin/activate
-
-# 2. Docker 서비스 실행 (DB, Redis, Worker, Flower, Nginx)
-docker-compose up -d
-
-# 3. Flask 개발 서버 실행 (터미널 1)
-flask run
-
-# 4. Celery 워커 실행 (터미널 2 - Docker 미사용 시 필요)
-# docker-compose를 사용 중이라면 생략 가능
-celery -A celery_worker.celery worker --loglevel=info
+# 터미널에서 실행
+docker-compose up --build -d
 ```
+
+실행 후 다음 주소들이 정상 접근 가능한지 확인합니다:
+- **API 서버 (Nginx)**: http://localhost
+- **Swagger UI (v1)**: http://localhost/api/v1/docs
+- **Swagger UI (v2)**: http://localhost/api/v2/docs
+- **Flower 대시보드**: http://localhost/flower/
 
 ---
 
-## 1. OAuth2 소셜 로그인 (Google)
+## 2. 기능별 테스트 시나리오
 
-구글 로그인은 브라우저 리다이렉션이 필요하므로 웹 브라우저를 통해 테스트합니다.
+### 2.1. API 버저닝 및 인증 (Swagger UI)
 
-### 테스트 방법
-1. 브라우저에서 `http://localhost:5000/api/v1/auth/google/login` 접속
+Swagger UI를 통해 회원가입, 로그인, 그리고 v1/v2 API 차이를 확인합니다.
+
+1. **Swagger 접속**: [http://localhost/api/v1/docs](http://localhost/api/v1/docs) 접속
+2. **회원가입 (Register)**:
+   - `Auth` 섹션의 `POST /auth/register` 선택 -> **Try it out**
+   - `payload`: `email`, `password` 등 입력 -> **Execute**
+   - **Response 201 Created** 확인
+3. **로그인 (Login)**:
+   - `Auth` 섹션의 `POST /auth/login` 선택 -> **Try it out**
+   - 가입한 정보 입력 -> **Execute**
+   - **Response Body**에서 `access_token` 복사
+4. **인증 토큰 설정**:
+   - 우측 상단 **Authorize** 버튼 클릭
+   - `Bearer <복사한_액세스_토큰>` 입력 -> **Authorize** -> **Close**
+5. **v1 vs v2 비교**:
+   - **v1**: `Users` -> `GET /users` 호출 -> 단순 리스트 반환 확인
+   - **v2**: [http://localhost/api/v2/docs](http://localhost/api/v2/docs) 접속 및 토큰 설정
+   - `Users` -> `GET /users` 호출 -> **Response Body**에 `metadata`, `links`가 포함된 HATEOAS 구조 확인
+
+### 2.2. 고급 페이지네이션 (Swagger UI)
+
+v2 API Swagger에서 링크 헤더와 페이지네이션 동작을 확인합니다.
+
+1. **Swagger v2 접속**: [http://localhost/api/v2/docs](http://localhost/api/v2/docs)
+2. `Users` -> `GET /users` 선택
+3. **Parameters** 입력:
+   - `page`: `1`
+   - `per_page`: `5`
+4. **Execute** 실행
+5. **Server response** 섹션 확인:
+   - **Body**: `links` 객체 (`self`, `next` 등) 확인
+   - **Headers**: `link` 헤더 (RFC 5988), `x-total-count` 등 커스텀 헤더 확인
+
+### 2.3. Redis 캐싱 (Swagger UI & Logs)
+
+캐싱 적용 여부를 응답 속도와 서버 로그로 확인합니다.
+
+1. **Swagger v1**에서 `GET /users` 준비
+2. **첫 번째 Execute**:
+   - `docker-compose logs -f app` 명령어로 로그 확인 시 DB 쿼리 로그 발생
+   - 응답 시간 확인 (예: 100ms)
+3. **두 번째 Execute**:
+   - 로그에 DB 쿼리가 발생하지 않음 (캐시 히트)
+   - 응답 시간 단축 확인 (예: 5ms)
+
+### 2.4. OAuth2 소셜 로그인 (Browser)
+
+Swagger가 아닌 브라우저 주소창을 이용합니다.
+
+1. 브라우저 주소창 입력: `http://localhost/api/v1/auth/google/login`
 2. 구글 로그인 페이지로 리다이렉트 되는지 확인
-3. (실제 로그인은 구글 Cloud Console 설정 및 콜백 처리가 완료되어야 가능)
+   - (실제 로그인은 Google Cloud 설정에 등록된 리다이렉트 URI가 일치해야 완료됨)
 
-> **참고**: `.env` 파일에 `GOOGLE_CLIENT_ID`와 `GOOGLE_CLIENT_SECRET`이 설정되어 있어야 합니다.
+### 2.5. WebSocket 실시간 통신 (Browser Client)
 
----
+제공된 테스트용 HTML 파일을 사용합니다.
 
-## 2. WebSocket 실시간 통신 (Flask-SocketIO)
+1. `examples/websocket_client.html` 파일을 브라우저로 열기
+2. **Status**가 **Connected**로 변하는지 확인
+3. **Send Test Message** 버튼 클릭
+4. 화면 아래 로그 영역에 서버로부터 받은 응답(`response`)이 출력되는지 확인
 
-제공된 HTML 클라이언트 예제를 사용하여 WebSocket 연결 및 메시지 송수신을 테스트합니다.
+### 2.6. Prometheus 메트릭 (Browser)
 
-### 테스트 방법
-1. `examples/websocket_client.html` 파일을 브라우저로 엽니다.
-   - Chrome 기준: `File` -> `Open File...` -> `examples/websocket_client.html` 선택
-2. **"Status: Connected"** 메시지가 나타나는지 확인합니다.
-3. **"Send Test Message"** 버튼을 클릭합니다.
-4. 서버 로그(터미널)와 브라우저 화면에 메시지 전송/수신 로그가 찍히는지 확인합니다.
+1. 브라우저 접속: `http://localhost/metrics`
+2. 화면에 텍스트로 된 메트릭 정보가 출력되는지 확인
+3. `Ctrl+F`로 `app_cache_hits_total` 등을 검색하여 수치 변화 확인
 
----
+### 2.7. Celery Flower 대시보드 (Browser)
 
-## 3. Redis 캐싱 (Caching)
+1. 브라우저 접속: `http://localhost/flower/`
+2. 로그인: `admin` / `change_me`
+3. 대시보드 확인:
+   - **Workers** 탭: `celery@flask_celery_worker` 상태가 **Online**인지 확인
+   - **Tasks** 탭: 이메일 발송 등 비동기 작업 이력 확인
 
-`UserService.get_users` 메서드에 적용된 `@cached` 데코레이터를 검증합니다.
+### 2.8. Sentry 에러 트래킹 (Optional)
 
-### 테스트 방법 (cURL)
-
-**첫 번째 요청 (Cache Miss):**
-```bash
-# 시간 측정과 함께 요청
-time curl -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" http://localhost:5000/api/v1/users
-```
-- 예상 결과: DB 조회로 인해 상대적으로 느림, Prometheus 메트릭의 `cache_misses` 증가
-
-**두 번째 요청 (Cache Hit):**
-```bash
-time curl -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" http://localhost:5000/api/v1/users
-```
-- 예상 결과: **즉각적인 응답 (매우 빠름)**, Prometheus 메트릭의 `cache_hits` 증가
+1. 고의로 에러를 발생시키는 테스트 코드를 작성하거나, DB 연결을 끊고 API를 호출하여 500 에러 유발
+2. Sentry 대시보드에서 해당 에러가 수집되었는지 확인
 
 ---
 
-## 4. Prometheus 메트릭 (Metrics)
+## 3. 요약
 
-애플리케이션 및 시스템 메트릭이 정상적으로 수집되는지 확인합니다.
-
-### 테스트 방법
-1. 브라우저 또는 cURL로 `http://localhost:5000/metrics` 접속
-2. 다음과 같은 메트릭 키워드가 포함되어 있는지 검색 (`Cmd+F`):
-   - `flask_http_request_duration_seconds`
-   - `app_user_registrations_total`
-   - `app_cache_hits_total`
-   - `process_cpu_seconds_total`
-
----
-
-## 5. Sentry 에러 트래킹 (Error Tracking)
-
-Sentry 연동 확인을 위해 테스트용 에러를 유발하거나 설정을 확인합니다.
-
-### 테스트 방법
-1. `.env` 파일에 유효한 `SENTRY_DSN`이 설정되어 있는지 확인합니다.
-2. 실행 시 로그에 `[Sentry] Initializing SDK...` 관련 메시지가 있는지 확인합니다.
-3. (선택) 임의의 에러를 발생시키는 임시 라우트를 만들어 접속해봅니다.
-   ```python
-   # app/api/v1/health.py 등에 임시 추가
-   @api.route('/error')
-   class ErrorTest(Resource):
-       def get(self):
-           1 / 0  # ZeroDivisionError 발생 -> Sentry 전송
-   ```
-
----
-
-## 6. API 버저닝 (v1 vs v2) 및 마이그레이션
-
-v1(기존) API와 v2(개선된) API의 응답 구조 차이를 확인합니다.
-
-### 테스트 방법 (cURL)
-
-**v1 API 호출 (Deprecated):**
-```bash
-curl -H "Authorization: Bearer <TOKEN>" http://localhost:5000/api/v1/users
-```
-- 응답 구조: `users` 리스트가 최상위에 위치
-- 헤더 확인: `API-Version: 1.0` (기본값)
-
-**v2 API 호출 (Recommended):**
-```bash
-curl -H "Authorization: Bearer <TOKEN>" \
-     -H "API-Version: 2.0" \
-     http://localhost:5000/api/v2/users
-```
-- 응답 구조: `data`, `pagination`, `metadata`, `links` 구조
-- `metadata`에 `response_time_ms` 등이 포함되어 있는지 확인
-
----
-
-## 7. 고급 페이지네이션 (Pagination)
-
-v2 API에서 HATEOAS 링크와 Link Header를 확인합니다.
-
-### 테스트 방법
-```bash
-curl -v -H "Authorization: Bearer <TOKEN>" \
-     "http://localhost:5000/api/v2/users?page=1&per_page=5"
-```
-
-**확인 사항:**
-1. **Response Body**: `links` 객체에 `self`, `next`, `last` 등의 URL이 포함됨
-2. **Response Header**: `Link` 헤더에 `<http://...>; rel="next"` 형태의 문자열 존재
-3. **Custom Headers**: `X-Total-Count`, `X-Total-Pages` 헤더 존재
-
----
-
-## 8. Celery Flower 대시보드
-
-비동기 작업 모니터링 대시보드 접근을 확인합니다.
-
-### 테스트 방법
-1. 브라우저에서 `http://localhost/flower/` 접속 (마지막 슬래시 중요)
-2. 로그인 창이 뜨면 아래 정보 입력:
-   - **User**: `admin`
-   - **Password**: `change_me` (또는 .env 설정값)
-3. 대시보드 진입 후 `Workers` 탭에서 `celery@flask_celery_worker` 상태가 **Online**인지 확인
-
----
-
-## 9. CI/CD 파이프라인 (GitHub Actions)
-
-자동화된 테스트 및 빌드 파이프라인 동작을 확인합니다.
-
-### 테스트 방법
-1. 코드를 GitHub 레포지토리에 푸시합니다.
-2. GitHub 레포지토리의 **Actions** 탭으로 이동합니다.
-3. **CI (Tests & Lint)** 워크플로우가 초록색 체크(✅)로 통과하는지 확인합니다.
-4. 태그 푸시 시 (`git tag v1.0.0 && git push --tags`) **CD (Docker Build)** 워크플로우가 실행되는지 확인합니다.
-
----
-
-## 10. 전체 자동 테스트 실행
-
-작성된 **pytest** 테스트 코드를 통해 기능 전반을 검증합니다.
-
-```bash
-# 전체 테스트 실행
-pytest -v
-
-# 특정 기능 테스트
-pytest tests/test_auth.py      # 인증, OAuth 등
-pytest tests/test_pagination.py # 페이지네이션 v1/v2
-pytest tests/test_cache.py      # 캐싱 로직
-```
+| 기능          | 테스트 도구    | 주요 확인 사항                   |
+| ------------- | -------------- | -------------------------------- |
+| **API 기능**  | Swagger UI     | 응답 코드, Body 구조, Auth 동작  |
+| **API v2**    | Swagger UI     | HATEOAS 링크, 페이지네이션 헤더  |
+| **캐싱**      | Swagger + Logs | 응답 속도, DB 쿼리 발생 여부     |
+| **WebSocket** | HTML Client    | 연결 상태, 메시지 수신           |
+| **모니터링**  | Browser        | `/metrics`, `/flower/` 접속 여부 |
