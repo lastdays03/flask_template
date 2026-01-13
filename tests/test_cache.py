@@ -1,7 +1,7 @@
 """Cache tests."""
 
 import time
-import pytest
+
 from app.utils.cache import cached, invalidate_cache
 
 
@@ -15,6 +15,9 @@ def expensive_operation(x):
 def test_cache_hit(app):
     """Test cache hit."""
     with app.app_context():
+        # Enable caching for this test
+        app.config["TESTING"] = False
+
         # First call - cache miss
         start = time.time()
         result1 = expensive_operation(5)
@@ -32,25 +35,35 @@ def test_cache_hit(app):
 def test_cache_expiration(app):
     """Test cache expiration."""
     with app.app_context():
-        result1 = expensive_operation(5)
-        assert result1 == 10
+        original_testing = app.config["TESTING"]
+        app.config["TESTING"] = False
+        try:
+            result1 = expensive_operation(5)
+            assert result1 == 10
 
-        # Wait for cache to expire
-        time.sleep(2.1)
+            # Wait for cache to expire
+            time.sleep(2.1)
 
-        result2 = expensive_operation(5)
-        assert result2 == 10
+            result2 = expensive_operation(5)
+            assert result2 == 10
+        finally:
+            app.config["TESTING"] = original_testing
 
 
 def test_cache_invalidation(app):
     """Test cache invalidation."""
     with app.app_context():
-        expensive_operation(5)
+        original_testing = app.config["TESTING"]
+        app.config["TESTING"] = False
+        try:
+            expensive_operation(5)
 
-        # Invalidate cache
-        count = invalidate_cache("test:*")
-        assert count >= 0
+            # Invalidate cache
+            count = invalidate_cache("test:*")
+            assert count >= 0
 
-        # Should recalculate
-        result = expensive_operation(5)
-        assert result == 10
+            # Should recalculate
+            result = expensive_operation(5)
+            assert result == 10
+        finally:
+            app.config["TESTING"] = original_testing

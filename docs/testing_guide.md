@@ -11,15 +11,30 @@
 docker-compose up --build -d
 ```
 
-실행 후 다음 주소들이 정상 접근 가능한지 확인합니다:
-- **API 서버 (Nginx)**: http://localhost
-- **Swagger UI (v1)**: http://localhost/api/v1/docs
-- **Swagger UI (v2)**: http://localhost/api/v2/docs
-- **Flower 대시보드**: http://localhost/flower/
+---
+
+## 2. 어떤 테스트를 해야 하나요? (Testing Pyramid)
+
+이 프로젝트는 3단계 테스트 전략을 사용합니다. 지금 읽고 계신문서는 **3번 수동 테스트**에 집중합니다.
+
+1.  **단위 테스트 (Unit Test)**: `pytest`로 코드 실행 (가장 빠름) → *[테스트 코드 가이드](test_code_guide.md) 참고*
+2.  **통합 테스트 (Integration Test)**: DB, Redis까지 연결해서 테스트
+3.  **수동 테스트 (E2E Test)**: 브라우저나 Swagger로 사용자가 직접 확인
 
 ---
 
-## 2. 기능별 테스트 시나리오
+## 3. 기능별 수동 테스트 (Manual Testing)
+
+### ✅ 테스트 체크리스트
+- [ ] Swagger가 열리는가?
+- [ ] 회원가입/로그인이 되는가?
+- [ ] JWT 토큰으로 인증이 되는가?
+- [ ] DB에 데이터가 들어갔는가?
+
+---
+
+### 3.1. API 버저닝 및 인증 (Swagger UI)
+(이하 생략...)
 
 ### 2.1. API 버저닝 및 인증 (Swagger UI)
 

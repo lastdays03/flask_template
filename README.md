@@ -11,7 +11,7 @@
   - JWT Access/Refresh Token 기반 인증 (Redis Blacklist 연동 로그아웃 지원)
   - **Google OAuth2** 소셜 로그인
   - **강력한 비밀번호 정책**: 최소 8자, 대/소문자, 숫자, 특수문자 포함 강제
-- **데이터베이스**: SQLAlchemy ORM (MySQL 8.0)
+- **데이터베이스**: SQLAlchemy ORM (MariaDB 10.8)
 - **비동기 작업**: Celery 5.3 + Redis Broker
 - **캐싱 & 큐**: Service 레벨 **Redis Caching** (@cached 데코레이터) 및 메시지 큐
 - **실시간 통신**: **Flask-SocketIO** 기반 WebSocket 지원 (알림 등)
@@ -27,7 +27,7 @@
 
 - **Backend**: Python 3.12, Flask 3.0
 - **API**: Flask-RESTX 1.3
-- **Database**: MySQL 8.0
+- **Database**: MariaDB 10.8
 - **Cache/Queue**: Redis 7
 - **Worker**: Celery 5.3
 - **Real-time**: Flask-SocketIO 5.3, Eventlet
@@ -62,21 +62,33 @@ flask_template/
 └── wsgi.py                  # WSGI 진입점
 ```
 
+
+## 📚 문서 (Documentation)
+
+더 자세한 내용은 아래 가이드 문서를 참고하세요.
+
+- **[개발 가이드 (Development Guide)](docs/development_guide.md)**: 아키텍처, 구현 패턴, 테스트 방법
+- **[배포 가이드 (Deployment Guide)](docs/deployment_guide.md)**: 서버 배포, 환경 설정, 모니터링 스택 구축
+- **[DB 사용 가이드 (Database Guide)](docs/database_guide.md)**: SQLAlchemy ORM 사용법 (CRUD, Transaction)
+- **[테스트 코드 가이드 (Test Code Guide)](docs/test_code_guide.md)**: Pytest 작성 및 실행 방법
+- **[기능별 테스트 가이드 (Manual Testing)](docs/testing_guide.md)**: Docker & Swagger UI 기반 수동 테스트
+- **[Swagger 가이드 (API Guide)](docs/development_guide.md#step-4-컨트롤러-구현-및-swagger-문서화-controller--swagger-docs)**: API 명세 작성법 (개발 가이드에 포함됨)
+
 ## 시작하기 (Quick Start)
 
 ### 1. 로컬 개발 환경 설정
 
 ```bash
 # 레포지토리 클론
-git clone <repository-url>
+git clone https://github.com/lastdays03/flask_template.git
 cd flask_template
 
 # 가상환경 생성 및 활성화
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# 의존성 설치
-pip install -r requirements.txt
+# 의존성 설치 (개발 툴 포함)
+pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 ### 2. 환경 변수 설정
@@ -87,18 +99,20 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-**주요 환경 변수:**
-- `SENTRY_DSN`: Sentry 프로젝트 DSN
-- `GOOGLE_CLIENT_ID` / `SECRET`: 구글 로그인 연동 시 필요
-- `FLOWER_USER` / `PASSWORD`: Celery 모니터링 대시보드 접근 계정
+**[필수 변경]**
+- `SECRET_KEY`, `JWT_SECRET_KEY`: 보안을 위해 변경 필요
+- `GOOGLE_CLIENT_ID`: 소셜 로그인 미사용 시 무시 가능
 
-### 3. 서비스 실행 (Docker)
+### 3. 인프라 실행 (Docker)
 
-MySQL, Redis 등 인프라 서비스를 Docker로 실행합니다.
+로컬 개발 시 DB와 Redis는 Docker로 실행하는 것이 편리합니다.
 
 ```bash
-docker compose up -d mysql redis
+# MariaDB 및 Redis 실행
+docker compose up -d mariadb redis
 ```
+
+> **참고**: 전체 스택(Nginx, Celery 등 포함)을 실행하려면 `docker compose up -d --build`를 사용하세요.
 
 ### 4. 데이터베이스 초기화
 
@@ -115,15 +129,23 @@ flask db upgrade
 flask run
 ```
 
-**Celery 워커:**
+**Celery 워커 & Flower (필요 시 별도 터미널):**
 ```bash
+# 워커 실행
 celery -A celery_worker.celery worker --loglevel=info
-```
 
-**Celery Flower 대시보드 (선택):**
-```bash
+# 모니터링 대시보드 (http://localhost:5555)
 celery -A celery_worker.celery flower --conf=flower_config
 ```
+
+### 6. 모니터링 스택 (선택)
+GlitchTip(Sentry)은 별도의 독립된 스택으로 관리됩니다.
+
+```bash
+cd monitoring
+docker compose up -d
+```
+- 자세한 내용은 [배포 가이드](docs/deployment_guide.md)를 참고하세요.
 
 ---
 

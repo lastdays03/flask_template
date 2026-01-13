@@ -35,27 +35,52 @@ jobs:
   # [선택 사항] 실제 서버 배포 (Deployment)
   # 서버가 준비되면 아래 주석을 해제하고 Secrets를 설정하여 사용하세요.
   # -------------------------------------------------------------------------
-  # deploy:
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Connect and Deploy via SSH
-  #       uses: appleboy/ssh-action@master
-  #       with:
-  #         host: ${{ secrets.SERVER_HOST }}
-  #         username: ${{ secrets.SERVER_USER }}
-  #         key: ${{ secrets.SERVER_SSH_KEY }}
-  #         port: 22
-  #         script: |
-  #           # 프로젝트 폴더로 이동 (서버에 미리 클론/설정 필요)
-  #           cd ~/flask_template
-  #
-  #           # 최신 코드 및 설정 업데이트
-  #           git pull origin main
-  #
-  #           # 최신 Docker 이미지 풀링
-  #           docker compose pull
-  #
-  #           # 서비스 재시작 (Zero-downtime이 필요하면 Rolling Update 구성 필요)
-  #           docker compose up -d
-  #           docker image prune -f
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect and Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            PROJECT_DIR="~/flask_template"
+            REPO_URL="https://github.com/lastdays03/flask_template.git"
+
+            # 1. 소스 코드 준비 (Clone or Pull)
+            if [ -d "$PROJECT_DIR" ]; then
+              echo "Project exists. Pulling latest changes..."
+              cd $PROJECT_DIR
+              git pull origin main
+            else
+              echo "Project not found. Cloning..."
+              git clone $REPO_URL $PROJECT_DIR
+              cd $PROJECT_DIR
+            fi
+
+            # 2. .env 파일 자동 생성 (없으면 Secret 기반 생성)
+            # 주의: GitHub Repository Secrets에 해당 값들이 등록되어 있어야 함
+            if [ ! -f ".env" ]; then
+              echo "Creating .env file..."
+              cat <<EOF > .env
+            FLASK_ENV=production
+            SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }}
+            JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            REDIS_URL=${{ secrets.REDIS_URL }}
+
+            # MariaDB Settings (docker-compose에서 사용)
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            EOF
+            fi
+
+            # 3. 서비스 실행
+            docker compose pull
+            docker compose up -d
+            docker image prune -f

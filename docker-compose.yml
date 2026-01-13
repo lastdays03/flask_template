@@ -8,11 +8,11 @@ services:
     env_file:
       - .env
     environment:
-      - FLASK_ENV=production
-      - DATABASE_URL=mysql+pymysql://flask_user:flask_password@mariadb:3306/flask_app
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
     depends_on:
       - mariadb
       - redis
@@ -45,10 +45,10 @@ services:
       - mariadb_data:/var/lib/mysql
     environment:
       - TZ=Asia/Seoul
-      - MYSQL_ROOT_PASSWORD=root_password
-      - MYSQL_DATABASE=flask_app
-      - MYSQL_USER=flask_user
-      - MYSQL_PASSWORD=flask_password
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     command: [ "mysqld", "--innodb-buffer-pool-size=256M", "--max-connections=50", "--innodb-flush-log-at-trx-commit=2", "--lower_case_table_names=1", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--skip-character-set-client-handshake" ]
     deploy:
       resources:
@@ -78,11 +78,11 @@ services:
     env_file:
       - .env
     environment:
-      - FLASK_ENV=production
-      - DATABASE_URL=mysql+pymysql://flask_user:flask_password@mariadb:3306/flask_app
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
     depends_on:
       - mariadb
       - redis
@@ -101,9 +101,9 @@ services:
     env_file:
       - .env
     environment:
-      - FLASK_ENV=production
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
       - FLOWER_USER=${FLOWER_USER:-admin}
       - FLOWER_PASSWORD=${FLOWER_PASSWORD:-change_me}
       - FLOWER_PORT=5555
