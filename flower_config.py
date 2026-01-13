@@ -18,7 +18,7 @@ url_prefix = os.getenv("FLOWER_URL_PREFIX", "")
 
 # Persistent storage
 persistent = True
-db = os.getenv("FLOWER_DB", "flower.db")
+db = os.getenv("FLOWER_DB", "/tmp/flower.db")
 
 # Max tasks to keep in memory
 max_tasks = int(os.getenv("FLOWER_MAX_TASKS", "10000"))
