@@ -20,6 +20,7 @@ services:
       - ./logs:/app/logs
     networks:
       - backend
+      - proxy_net
 
   nginx:
     image: nginx:1.25-alpine
@@ -126,3 +127,6 @@ volumes:
 networks:
   backend:
     driver: bridge
+  proxy_net:
+    external: true
+    name: nginx-proxy

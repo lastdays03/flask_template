@@ -87,7 +87,8 @@ jobs:
             mkdir -p logs
             chmod 777 logs
 
-            # 4. 서비스 실행
+            # 4. 서비스 실행 (Nginx 제외 - NPM 사용)
             docker compose pull
-            docker compose up -d
+            # docker compose up -d
+            docker compose up -d app mariadb redis celery_worker flower
             docker image prune -f
