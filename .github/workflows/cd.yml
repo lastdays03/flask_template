@@ -47,6 +47,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
+            # 홈 디렉토리로 이동 (안전장치)
+            cd ~
+
             PROJECT_DIR="flask_template"
             REPO_URL="https://github.com/lastdays03/flask_template.git"
 
