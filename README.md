@@ -196,7 +196,7 @@ docker compose logs -f
 ```
 
 - **API Server**: http://localhost (Nginx 80포트)
-- **Flower Dashboard**: http://localhost/flower/ (Celery 모니터링)
+- **Flower Dashboard**: http://localhost/flower/ (Celery 모니터링, 뒤에 `/` 필수)
 
 ### 자동 배포 (Automated Deployment via GitHub Actions)
 
