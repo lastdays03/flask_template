@@ -47,7 +47,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
-            PROJECT_DIR="~/flask_template"
+            PROJECT_DIR="flask_template"
             REPO_URL="https://github.com/lastdays03/flask_template.git"
 
             # 1. 소스 코드 준비 (Clone or Pull)
@@ -80,7 +80,11 @@ jobs:
             EOF
             fi
 
-            # 3. 서비스 실행
+            # 3. 로그 폴더 권한 설정 (Permission Denied 방지)
+            mkdir -p logs
+            chmod 777 logs
+
+            # 4. 서비스 실행
             docker compose pull
             docker compose up -d
             docker image prune -f
