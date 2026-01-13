@@ -53,6 +53,9 @@ def create_app(config_name="default"):
     # Import event handlers
     from app.events import notifications  # noqa
 
+    # Import Celery tasks
+    from app import tasks  # noqa
+
     # Initialize Metrics
     if config_name != "testing":
         from app.utils.metrics import init_metrics
