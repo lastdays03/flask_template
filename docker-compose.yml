@@ -91,6 +91,12 @@ services:
       - ./logs:/app/logs
     networks:
       - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "celery -A celery_worker.celery inspect ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   flower:
     build:
@@ -118,6 +124,12 @@ services:
       - backend
     volumes:
       - .:/app
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:5555/flower/health')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
   mariadb_data:
