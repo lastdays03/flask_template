@@ -63,7 +63,34 @@ docker compose logs -f
 
 ---
 
-## 3. 모니터링 스택 배포 (Monitoring Stack)
+## 3. 자주 쓰는 도커 명령어 (Docker Cheat Sheet)
+
+서버 운영 시 필수적으로 알아야 할 명령어입니다.
+
+| 명령어                              | 설명                                                                       |
+| :---------------------------------- | :------------------------------------------------------------------------- |
+| `docker compose up -d`              | 서비스를 백그라운드에서 실행합니다. (이미지가 없으면 빌드/다운로드)        |
+| `docker compose down`               | 실행 중인 서비스를 멈추고 컨테이너를 삭제합니다. (데이터는 보존됨)         |
+| `docker compose logs -f [서비스명]` | 실시간 로그를 확인합니다. 예: `docker compose logs -f app`                 |
+| `docker compose restart [서비스명]` | 특정 서비스를 재시작합니다.                                                |
+| `docker system prune -a`            | 사용하지 않는 모든 이미지와 컨테이너를 삭제하여 용량을 확보합니다. (주의!) |
+
+---
+
+## 4. 문제 해결 (Troubleshooting)
+
+### Q. "Bind for 0.0.0.0:80 failed: port is already allocated" 에러
+- **원인**: 이미 다른 프로그램(예: 다른 웹서버)이 80번 포트를 쓰고 있습니다.
+- **해결**: 해당 프로그램을 끄거나, `docker-compose.yml`에서 nginx 포트를 `8080:80` 등으로 변경하세요.
+
+### Q. DB 연결 에러 ("Can't connect to MySQL server")
+- **원인**: DB 컨테이너가 아직 완전히 켜지지 않았는데 앱이 먼저 붙으려고 해서 그렇습니다.
+- **해결**: 보통 앱이 몇 번 재시도하다가 붙습니다. 계속 안 되면 `docker compose logs mariadb`로 DB 로그를 확인해보세요. 비밀번호 설정이 `.env`와 맞는지 확인하세요.
+
+---
+
+## 5. 모니터링 스택 배포 (Monitoring Stack)
+(이하 생략...)
 
 이 프로젝트는 **GlitchTip(Sentry 오픈소스 대안)** 모니터링 스택을 별도로 관리합니다.
 앱 배포와 독립적으로 실행되므로 별도의 설정이 필요합니다.

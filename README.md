@@ -69,7 +69,10 @@ flask_template/
 
 - **[개발 가이드 (Development Guide)](docs/development_guide.md)**: 아키텍처, 구현 패턴, 테스트 방법
 - **[배포 가이드 (Deployment Guide)](docs/deployment_guide.md)**: 서버 배포, 환경 설정, 모니터링 스택 구축
-- **[Swagger 가이드 (API Guide)](docs/development_guide.md#step-2-스키마schema-정의-api-명세)**: API 명세 작성법 (개발 가이드에 포함됨)
+- **[DB 사용 가이드 (Database Guide)](docs/database_guide.md)**: SQLAlchemy ORM 사용법 (CRUD, Transaction)
+- **[테스트 코드 가이드 (Test Code Guide)](docs/test_code_guide.md)**: Pytest 작성 및 실행 방법
+- **[기능별 테스트 가이드 (Manual Testing)](docs/testing_guide.md)**: Docker & Swagger UI 기반 수동 테스트
+- **[Swagger 가이드 (API Guide)](docs/development_guide.md#step-4-컨트롤러-구현-및-swagger-문서화-controller--swagger-docs)**: API 명세 작성법 (개발 가이드에 포함됨)
 
 ## 시작하기 (Quick Start)
 

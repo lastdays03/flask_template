@@ -27,6 +27,25 @@
 - **역할**: API 요청/응답 데이터의 **형식(Structure)**을 정의하고 검증합니다.
 - **도구**: `flask-restx`의 `Namespace`와 `fields`를 사용합니다.
 
+### 🔄 데이터 흐름도 (Sequence Diagram)
+
+```mermaid
+sequenceDiagram
+    participant Client as 사용자 (Client)
+    participant Ctl as Controller (API)
+    participant Svc as Service (Logic)
+    participant DB as Model (Database)
+
+    Client->>Ctl: 1. HTTP 요청 (POST /products)
+    Ctl->>Ctl: 2. 요청 데이터 검증 (Schema)
+    Ctl->>Svc: 3. 비즈니스 로직 호출
+    Svc->>Svc: 4. 유효성 검사 (가격 < 0 ?)
+    Svc->>DB: 5. 데이터 저장 (save)
+    DB-->>Svc: 6. 저장된 객체 반환
+    Svc-->>Ctl: 7. 결과 반환
+    Ctl-->>Client: 8. HTTP 201 응답 + JSON
+```
+
 ---
 
 ## 🚀 기능 구현 가이드 (Step-by-Step)
@@ -54,7 +73,7 @@ class Product(BaseModel):
 ```
 > **Tip**: 모델을 만들면 `app/__init__.py`나 `migrations/env.py` 등에서 import 해야 마이그레이션이 인식될 수 있습니다.
 
-### Step 2. 스키마(Schema) 정의 (API 명세)
+### Step 2. 스키마 정의 (Schema Definition)
 클라이언트가 보낼 데이터(Request)와 우리가 돌려줄 데이터(Response)의 모양을 정의합니다.
 
 **파일**: `app/schemas/product.py`
@@ -105,7 +124,7 @@ class ProductService:
         return Product.query.all()
 ```
 
-### Step 4. 컨트롤러(Controller) 구현 (API 연결)
+### Step 4. 컨트롤러 구현 및 Swagger 문서화 (Controller & Swagger Docs)
 Schema와 Service를 연결하고 API 엔드포인트를 만듭니다. 여기서 **데코레이터**들이 핵심 역할을 합니다.
 
 **파일**: `app/api/v1/products.py`
@@ -170,42 +189,34 @@ api.add_namespace(products_ns, path="/products") # 등록
 
 ---
 
-## 🧪 테스트 가이드
+## 🧪 테스트 (Testing)
 
-코드 작성만큼 테스트도 중요합니다. `tests/` 폴더에 테스트 코드를 작성합니다.
+코드 작성만큼 테스트도 중요합니다. 자세한 작성법과 실행 방법은 **[테스트 코드 가이드 (Test Code Guide)](test_code_guide.md)**를 참고하세요.
 
 ```bash
 # 전체 테스트 실행
 pytest
-
-# 특정 파일 테스트 실행
-pytest tests/test_products.py
 ```
 
-### 테스트 작성 예시
-`conftest.py`에 있는 `client` 픽스처를 사용하면 쉽게 API 요청을 보낼 수 있습니다.
-
-```python
-def test_create_product(client, db_session):
-    # Given
-    payload = {"name": "Test Product", "price": 1000}
-
-    # When
-    response = client.post("/api/v1/products", json=payload)
-
-    # Then
-    assert response.status_code == 201
-    assert response.json["name"] == "Test Product"
-```
-
----
 
 ## 💡 주요 규칙 (Convention)
 
 1.  **명명 규칙**: 파일명은 `snake_case`, 클래스명은 `PascalCase`를 사용합니다.
 2.  **DTO 분리**: `app/schemas/`에 API 모델을 정의하고, Controller는 이를 import해서 사용합니다.
-3.  **마이그레이션**: 모델을 변경하면 DB에 반영해야 합니다.
-    ```bash
-    flask db migrate -m "Add product model"
-    flask db upgrade
-    ```
+3.  **마이그레이션**: 모델을 변경하면 DB에 반영해야 합니다. 자세한 명령어는 **[DB 가이드 (Database Guide)](database_guide.md)**를 참고하세요.
+
+---
+
+## ❓ 자주 하는 실수와 해결법 (Troubleshooting)
+
+### Q1. "ImportError: cannot import name..." 에러가 나요.
+- **원인**: 순환 참조(Circular Import)가 발생했거나, 파일이나 변수 이름이 틀렸을 수 있습니다.
+- **해결**: A파일이 B를 import하는데, B파일이 다시 A를 import하는지 확인하세요.
+
+### Q2. DB에 데이터가 안 들어가요.
+- **원인**: `db.session.commit()`이 호출되지 않았기 때문입니다.
+- **해결**: `save()` 메서드(내부적으로 commit 포함)를 사용했는지, 혹은 Service에서 명시적으로 commit 했는지 확인하세요.
+
+### Q3. Swagger에 API가 안 떠요.
+- **원인**: 새로운 Controller 파일을 만들고 `__init__.py`에 등록하지 않아서입니다.
+- **해결**: `app/api/v1/__init__.py` 파일에 `api.add_namespace(...)` 코드를 추가했는지 확인하세요.
