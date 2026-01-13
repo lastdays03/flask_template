@@ -129,4 +129,4 @@ networks:
     driver: bridge
   proxy_net:
     external: true
-    name: npm_default # 나중에 서버의 실제 NPM 네트워크 이름으로 변경하세요!
+    name: nginx-proxy
