@@ -198,6 +198,25 @@ docker compose logs -f
 - **API Server**: http://localhost (Nginx 80포트)
 - **Flower Dashboard**: http://localhost/flower/ (Celery 모니터링)
 
+### 자동 배포 (Automated Deployment via GitHub Actions)
+
+GitHub Actions를 통해 서버로의 자동 배포가 구성되어 있습니다 (`.github/workflows/cd.yml`).
+
+1. **배포 트리거**:
+   - `main` 브랜치에 태그(예: `v1.0.0`)를 push하면 자동으로 배포 파이프라인이 실행됩니다.
+   - `develop` 브랜치에 코드가 push되면 자동으로 CI(테스트)가 실행됩니다.
+
+2. **배포 프로세스**:
+   - Docker 이미지를 빌드하여 DockerHub에 푸시합니다.
+   - SSH를 통해 운영 서버에 접속합니다.
+   - 최신 코드를 pull하고, GitHub Secrets를 기반으로 `.env` 파일을 **자동 생성**합니다.
+   - `docker compose`를 실행하여 컨테이너를(재)시작합니다.
+
+3. **Nginx Proxy Manager 연동**:
+   - 현재 배포 설정은 외부 **Nginx Proxy Manager (NPM)** 사용을 전제로 합니다.
+   - 내부 Nginx 컨테이너는 비활성화되며, `app` 컨테이너가 `nginx-proxy` 네트워크에 연결됩니다.
+   - NPM에서 `app` (또는 `flask_app`) 호스트의 `5000` 포트로 프록시를 설정하세요.
+
 ## 개발 가이드 (Development Guide)
  
  **코드 품질 관리 (Linting & Formatting)**
