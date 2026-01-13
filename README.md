@@ -212,6 +212,16 @@ GitHub Actions를 통해 서버로의 자동 배포가 구성되어 있습니다
    - 최신 코드를 pull하고, GitHub Secrets를 기반으로 `.env` 파일을 **자동 생성**합니다.
    - `docker compose`를 실행하여 컨테이너를(재)시작합니다.
 
+   > [!IMPORTANT]
+   > **환경 변수(.env) 변경 시 주의사항**
+   >
+   > 배포 스크립트는 **`.env` 파일이 없을 때만** GitHub Secrets 값을 사용하여 새로 생성합니다 (덮어쓰기 방지).
+   > 따라서 Secrets를 변경했다면, **반드시 서버에서 기존 `.env` 파일을 삭제**한 후 배포해야 새로운 값이 적용됩니다.
+   > ```bash
+   > # 서버 터미널에서 실행
+   > rm ~/flask_template/.env
+   > ```
+
 3. **Nginx Proxy Manager 연동**:
    - 현재 배포 설정은 외부 **Nginx Proxy Manager (NPM)** 사용을 전제로 합니다.
    - 내부 Nginx 컨테이너는 비활성화되며, `app` 컨테이너가 `nginx-proxy` 네트워크에 연결됩니다.
