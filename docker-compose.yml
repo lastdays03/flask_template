@@ -122,6 +122,7 @@ services:
       - celery_worker
     networks:
       - backend
+      - proxy_net
     volumes:
       - .:/app
     healthcheck:
