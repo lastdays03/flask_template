@@ -2,7 +2,7 @@
 
 import sys
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -45,7 +45,8 @@ def app():
 def mock_redis():
     """Mock Redis client for all tests."""
     mock = MockRedis()
-    with patch("app.utils.auth.get_redis_client", return_value=mock):
+    with patch("app.utils.cache.get_redis_client", return_value=mock), \
+         patch("app.utils.auth.get_redis_client", return_value=mock):
         yield mock
 
 
