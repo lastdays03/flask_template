@@ -20,8 +20,7 @@ services:
       - ./logs:/app/logs
     networks:
       - backend
-    ports:
-      - "5000:5000"
+      - proxy_net
 
   nginx:
     image: nginx:1.25-alpine
@@ -128,3 +127,6 @@ volumes:
 networks:
   backend:
     driver: bridge
+  proxy_net:
+    external: true
+    name: npm_default # 나중에 서버의 실제 NPM 네트워크 이름으로 변경하세요!
