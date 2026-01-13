@@ -20,6 +20,8 @@ services:
       - ./logs:/app/logs
     networks:
       - backend
+    ports:
+      - "5000:5000"
 
   nginx:
     image: nginx:1.25-alpine
