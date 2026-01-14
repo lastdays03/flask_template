@@ -51,7 +51,7 @@ jobs:
             cd ~
 
             PROJECT_DIR="flask_template"
-            REPO_URL="https://github.com/lastdays03/flask_template.git"
+            REPO_URL="https://github.com/${{ github.repository }}.git"
 
             # 1. 소스 코드 준비 (Clone or Pull)
             if [ -d "$PROJECT_DIR" ]; then
