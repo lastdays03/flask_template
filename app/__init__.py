@@ -121,7 +121,7 @@ def create_app(config_name="default"):
 
     @flask_app.route("/debug-glitchtip")
     def trigger_error():
-        division_by_zero = 1 / 0
+        return 1 / 0
 
     # Register Error Handlers
     from app.utils.error_handlers import (
