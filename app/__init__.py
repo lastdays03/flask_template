@@ -119,6 +119,10 @@ def create_app(config_name="default"):
         """Global health check."""
         return jsonify({"status": "healthy"}), 200
 
+    @flask_app.route("/debug-glitchtip")
+    def trigger_error():
+        division_by_zero = 1 / 0
+
     # Register Error Handlers
     from app.utils.error_handlers import (
         register_error_handlers,
