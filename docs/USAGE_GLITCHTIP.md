@@ -36,14 +36,14 @@ GlitchTip을 처음 실행하면 관리자(Superuser) 계정 생성이 필요합
 
 ```bash
 # monitoring 폴더에서 실행
-docker compose run --rm web ./manage.py migrate
+docker compose run --rm monitoring_web ./manage.py migrate
 ```
 
 그 다음, 관리자 계정을 생성합니다.
 
 ```bash
 # monitoring 폴더에서 실행
-docker compose run --rm web ./manage.py createsuperuser
+docker compose run --rm monitoring_web ./manage.py createsuperuser
 # Email: admin@localhost
 # Password: (임의 설정)
 ```
