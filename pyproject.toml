@@ -1,0 +1,54 @@
+[project]
+name = "flask-template"
+version = "0.1.0"
+description = "Flask Production REST API Template"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "Flask==3.1.2",
+    "flask-restx==1.3.0",
+    "flask-sqlalchemy==3.1.1",
+    "flask-migrate==4.0.7",
+    "flask-jwt-extended==4.6.0",
+    "flask-cors==6.0.2",
+    "flask-limiter==3.5.1",
+    "PyMySQL==1.1.1",
+    "cryptography==46.0.3",
+    "redis==5.0.3",
+    "celery==5.3.6",
+    "gunicorn==21.2.0",
+    "python-dotenv==1.2.1",
+    "python-json-logger==2.0.7",
+    "passlib==1.7.4",
+    "bcrypt==4.0.1",
+    "authlib==1.3.0",
+    "httpx==0.27.0",
+    "requests==2.32.5",
+    "flask-socketio==5.3.6",
+    "python-socketio==5.11.1",
+    "simple-websocket==1.0.0",
+    "prometheus-client==0.20.0",
+    "prometheus-flask-exporter==0.23.0",
+    "sentry-sdk[flask]==1.40.6",
+    "flower==2.0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[dependency-groups]
+dev = [
+    "pytest==7.4.4",
+    "pytest-flask==1.3.0",
+    "pytest-cov==4.1.0",
+    "pytest-mock==3.12.0",
+    "faker==23.3.0",
+    "black==25.12.0",
+    "flake8==7.0.0",
+    "pip-audit==2.7.0",
+    "pre-commit==3.6.0",
+]
