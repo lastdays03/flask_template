@@ -45,8 +45,9 @@ def app():
 def mock_redis():
     """Mock Redis client for all tests."""
     mock = MockRedis()
-    with patch("app.utils.cache.get_redis_client", return_value=mock), patch(
-        "app.utils.auth.get_redis_client", return_value=mock
+    with (
+        patch("app.utils.cache.get_redis_client", return_value=mock),
+        patch("app.utils.auth.get_redis_client", return_value=mock),
     ):
         yield mock
 

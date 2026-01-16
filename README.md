@@ -83,12 +83,12 @@ flask_template/
 git clone https://github.com/lastdays03/flask_template.git
 cd flask_template
 
-# 가상환경 생성 및 활성화
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+# uv 설치 (이미 설치되어 있다면 생략)
+pip install uv
 
-# 의존성 설치 (개발 툴 포함)
-pip install -r requirements.txt -r requirements-dev.txt
+# 의존성 동기화 (가상환경 자동 생성)
+uv sync
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 ```
 
 ### 2. 환경 변수 설정
@@ -235,8 +235,9 @@ GitHub Actions를 통해 서버로의 자동 배포가 구성되어 있습니다
  
  1. **의존성 패키지 설치**
     ```bash
-    # 앱 실행 및 개발 툴 모두 설치
-    pip install -r requirements.txt -r requirements-dev.txt
+    # 앱 실행 및 개발 툴 모두 설치 (가상환경 자동 생성)
+    uv sync
+    source .venv/bin/activate
     ```
  
  2. **코드 포맷팅 (Black)**
@@ -259,7 +260,7 @@ GitHub Actions를 통해 서버로의 자동 배포가 구성되어 있습니다
     
     ```bash
     # pre-commit 설치 및 훅 설정
-    pip install -r requirements-dev.txt
+    # uv sync로 이미 설치됨
     pre-commit install --hook-type pre-push
     ```
     
