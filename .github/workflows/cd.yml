@@ -58,9 +58,8 @@ jobs:
               echo "Project exists. Fetching latest changes..."
               cd $PROJECT_DIR
               git fetch --all --tags
-              git reset --hard
+              git checkout -f ${{ github.ref_name }}
               git clean -fd
-              git checkout ${{ github.ref_name }}
             else
               echo "Project not found. Cloning..."
               git clone $REPO_URL $PROJECT_DIR
