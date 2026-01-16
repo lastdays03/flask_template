@@ -55,13 +55,15 @@ jobs:
 
             # 1. 소스 코드 준비 (Clone or Pull)
             if [ -d "$PROJECT_DIR" ]; then
-              echo "Project exists. Pulling latest changes..."
+              echo "Project exists. Fetching latest changes..."
               cd $PROJECT_DIR
-              git pull origin main
+              git fetch --all --tags
+              git checkout ${{ github.ref_name }}
             else
               echo "Project not found. Cloning..."
               git clone $REPO_URL $PROJECT_DIR
               cd $PROJECT_DIR
+              git checkout ${{ github.ref_name }}
             fi
 
             # 2. .env 파일 자동 생성 (없으면 Secret 기반 생성)
