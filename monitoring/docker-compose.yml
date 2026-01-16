@@ -10,14 +10,10 @@ services:
     volumes:
       - monitoring_postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
-    # networks:
-    #   - glitchtip_net
 
   monitoring_redis:
     image: redis:7
     restart: unless-stopped
-    # networks:
-    #   - glitchtip_net
 
   monitoring_web:
     image: glitchtip/glitchtip:latest
@@ -25,7 +21,7 @@ services:
       - monitoring_postgres
       - monitoring_redis
     ports:
-      - "40005:8000"
+      - "${PORT}:${PORT}"
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
@@ -36,8 +32,6 @@ services:
       - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
 
     restart: unless-stopped
-    # networks:
-    #   - glitchtip_net
 
   monitoring_worker:
     image: glitchtip/glitchtip:latest
@@ -55,8 +49,6 @@ services:
       - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
 
     restart: unless-stopped
-    # networks:
-    #   - glitchtip_net
 
 volumes:
   monitoring_postgres_data:
