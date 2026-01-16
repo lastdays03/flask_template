@@ -51,4 +51,5 @@ dev = [
     "flake8==7.0.0",
     "pip-audit==2.7.0",
     "pre-commit==3.6.0",
+    "pylint>=4.0.4",
 ]
